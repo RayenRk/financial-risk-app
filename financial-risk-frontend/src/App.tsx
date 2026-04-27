@@ -4,12 +4,9 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Financials from "./pages/Financials.tsx";
-
-// Placeholder pages — built next
-const RiskAnalysis = () => (
-  <div className="p-8 text-white">Risk Analysis — coming next</div>
-);
-const Alerts = () => <div className="p-8 text-white">Alerts — coming next</div>;
+import Alerts from "./pages/Alerts.tsx";
+import Users from "./pages/Users.tsx";
+import RiskAnalysis from "./pages/RiskAnalysis.tsx";
 
 export default function App() {
   return (
@@ -49,6 +46,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Alerts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute adminOnly>
+                <Users />
               </ProtectedRoute>
             }
           />

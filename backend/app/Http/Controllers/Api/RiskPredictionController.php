@@ -49,7 +49,11 @@ class RiskPredictionController extends Controller
         $company    = Company::firstOrFail();
         $prediction = RiskPrediction::with('quarter')
             ->where('company_id', $company->id)
-            ->orderByDesc('predicted_at')
+            ->orderByDesc(
+                Quarter::select('quarter_date')
+                    ->whereColumn('quarters.id', 'risk_predictions.quarter_id')
+                    ->limit(1)
+        )
             ->firstOrFail();
 
         return response()->json([
