@@ -17,7 +17,8 @@ class RiskPredictionController extends Controller
     // GET /api/predictions — all predictions ordered by quarter date
     public function index()
     {
-        $company     = Company::firstOrFail();
+        $ticker  = config('app.primary_ticker', 'EPAM');
+        $company = Company::where('ticker', $ticker)->firstOrFail();
         $predictions = RiskPrediction::with('quarter')
             ->where('company_id', $company->id)
             ->orderBy('predicted_at')
@@ -46,7 +47,8 @@ class RiskPredictionController extends Controller
     // GET /api/predictions/latest — latest quarter prediction
     public function latest()
     {
-        $company    = Company::firstOrFail();
+        $ticker  = config('app.primary_ticker', 'EPAM');
+        $company = Company::where('ticker', $ticker)->firstOrFail();
         $prediction = RiskPrediction::with('quarter')
             ->where('company_id', $company->id)
             ->orderByDesc(

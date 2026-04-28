@@ -38,16 +38,16 @@ export default function Login() {
           <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
-          <span className="text-white font-semibold text-lg tracking-tight">FinRisk</span>
+          <span className="text-white font-semibold text-lg tracking-tight">FinXG</span>
         </div>
 
         <div>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
-            Financial Risk<br />
-            <span className="text-blue-400">Intelligence Platform</span>
+            Risk Detection<br />
+            <span className="text-blue-400">Intelligent Platform</span>
           </h1>
           <p className="text-gray-400 text-lg leading-relaxed mb-10">
-            AI-powered risk detection and financial analysis for enterprise decision makers.
+            AI-powered risk detection and financial analysis and alerts for enterprise.
           </p>
 
           {/* Stats */}
@@ -79,7 +79,7 @@ export default function Login() {
             <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
-            <span className="text-white font-semibold text-lg">FinRisk</span>
+            <span className="text-white font-semibold text-lg">FinXG</span>
           </div>
 
           <div className="mb-8">

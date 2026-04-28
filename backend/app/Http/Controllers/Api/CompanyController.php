@@ -8,23 +8,25 @@ use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
-    // GET /api/company — full company info
     public function show()
     {
-        $company = Company::with(['latestQuarter.riskPrediction'])->firstOrFail();
+        $ticker  = config('app.primary_ticker', 'EPAM');
+        $company = Company::with(['latestQuarter.riskPrediction'])
+            ->where('ticker', $ticker)
+            ->firstOrFail();
 
         return response()->json([
-            'id'          => $company->id,
-            'ticker'      => $company->ticker,
-            'name'        => $company->name,
-            'sector'      => $company->sector,
-            'industry'    => $company->industry,
-            'country'     => $company->country,
-            'employees'   => $company->employees,
-            'market_cap'  => $company->market_cap,
-            'website'     => $company->website,
-            'description' => $company->description,
-            'fetched_at'  => $company->fetched_at,
+            'id'           => $company->id,
+            'ticker'       => $company->ticker,
+            'name'         => config('app.primary_display_name', $company->name),
+            'sector'       => $company->sector,
+            'industry'     => $company->industry,
+            'country'      => $company->country,
+            'employees'    => $company->employees,
+            'market_cap'   => $company->market_cap,
+            'website'      => $company->website,
+            'description'  => $company->description,
+            'fetched_at'   => $company->fetched_at,
             'current_risk' => $company->latestQuarter?->riskPrediction?->risk_label,
             'risk_color'   => $company->latestQuarter?->riskPrediction?->risk_color,
         ]);

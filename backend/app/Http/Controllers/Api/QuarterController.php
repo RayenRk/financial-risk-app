@@ -11,7 +11,8 @@ class QuarterController extends Controller
     // GET /api/quarters — all quarters with predictions
     public function index()
     {
-        $company  = Company::firstOrFail();
+        $ticker  = config('app.primary_ticker', 'EPAM');
+        $company = Company::where('ticker', $ticker)->firstOrFail();
         $quarters = Quarter::with('riskPrediction')
             ->where('company_id', $company->id)
             ->orderBy('quarter_date')
@@ -29,7 +30,8 @@ class QuarterController extends Controller
     // GET /api/quarters/latest — most recent quarter
     public function latest()
     {
-        $company = Company::firstOrFail();
+        $ticker  = config('app.primary_ticker', 'EPAM');
+        $company = Company::where('ticker', $ticker)->firstOrFail();
         $quarter = Quarter::with('riskPrediction')
             ->where('company_id', $company->id)
             ->orderByDesc('quarter_date')
@@ -41,6 +43,8 @@ class QuarterController extends Controller
     // GET /api/quarters/{id} — single quarter by id
     public function show(int $id)
     {
+        $ticker  = config('app.primary_ticker', 'EPAM');
+        $company = Company::where('ticker', $ticker)->firstOrFail();
         $quarter = Quarter::with('riskPrediction')->findOrFail($id);
         return response()->json($this->formatQuarter($quarter));
     }

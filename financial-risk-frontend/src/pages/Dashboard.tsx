@@ -7,6 +7,7 @@ import {
   Shield,
   Activity,
   Building2,
+  RefreshCw,
 } from "lucide-react";
 import {
   AreaChart,
@@ -21,6 +22,8 @@ import {
 } from "recharts";
 import Layout from "../components/Layout.tsx";
 import api from "../api/axios.ts";
+import { useAuth } from "../context/AuthContext.tsx";
+import { useConfig } from "../context/ConfigContext.tsx";
 
 interface Company {
   id: number;
@@ -80,29 +83,48 @@ const formatLargeNum = (val: number) => {
 };
 
 export default function Dashboard() {
+  const { isAdmin } = useAuth();
+  const { primary_display_name } = useConfig();
+
   const [company, setCompany] = useState<Company | null>(null);
   const [quarters, setQuarters] = useState<Quarter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<string>("None");
+
+  const fetchData = async () => {
+    try {
+      const [companyRes, quartersRes] = await Promise.all([
+        api.get("/company"),
+        api.get("/quarters"),
+      ]);
+      setCompany(companyRes.data);
+      setQuarters(quartersRes.data.quarters ?? []);
+    } catch (err: any) {
+      console.error("Dashboard fetch error:", err);
+      setError(
+        err?.response?.data?.message ?? "Failed to load dashboard data.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await api.post("/epam/refresh");
+      await fetchData();
+      setLastRefresh(new Date().toLocaleTimeString());
+    } catch {
+      // silent
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [companyRes, quartersRes] = await Promise.all([
-          api.get("/company"),
-          api.get("/quarters"),
-        ]);
-        setCompany(companyRes.data);
-        setQuarters(quartersRes.data.quarters ?? []);
-      } catch (err: any) {
-        console.error("Dashboard fetch error:", err);
-        setError(
-          err?.response?.data?.message ?? "Failed to load dashboard data.",
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 
@@ -151,27 +173,55 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">{company?.name}</h1>
+            <h1 className="text-2xl font-bold text-white">
+              {primary_display_name}
+            </h1>{" "}
             <p className="text-gray-400 mt-1">
               {company?.sector} · {company?.country} · NYSE: {company?.ticker}
             </p>
           </div>
-          {/* Current risk badge */}
-          <div className="text-right">
-            <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold"
-              style={{
-                color: company?.risk_color,
-                borderColor: company?.risk_color + "40",
-                background: company?.risk_color + "15",
-              }}
-            >
-              <Shield className="w-4 h-4" />
-              {riskLabel(company?.current_risk ?? "")}
+
+          <div className="flex items-center gap-3">
+            {/* Admin refresh button */}
+            {isAdmin() && (
+              <div className="flex flex-col items-end gap-1">
+                <button
+                  onClick={handleRefresh}
+                  disabled={refreshing}
+                  className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 rounded-xl text-sm transition-colors"
+                >
+                  <RefreshCw
+                    className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
+                  />
+                  {refreshing
+                    ? "Refreshing..."
+                    : `Refresh ${primary_display_name}`}
+                </button>
+                {lastRefresh && (
+                  <p className="text-gray-500 text-xs">
+                    Last refreshed: {lastRefresh}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* Risk badge */}
+            <div className="text-right">
+              <div
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-semibold"
+                style={{
+                  color: company?.risk_color,
+                  borderColor: company?.risk_color + "40",
+                  background: company?.risk_color + "15",
+                }}
+              >
+                <Shield className="w-4 h-4" />
+                {riskLabel(company?.current_risk ?? "")}
+              </div>
+              <p className="text-gray-500 text-xs mt-1">
+                Latest: {latest?.quarter_date?.split("T")[0]}
+              </p>
             </div>
-            <p className="text-gray-500 text-xs mt-1">
-              Latest: {latest?.quarter_date?.split("T")[0]}
-            </p>
           </div>
         </div>
 
@@ -246,7 +296,6 @@ export default function Dashboard() {
 
         {/* Charts row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Revenue chart */}
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <h3 className="text-white font-semibold mb-1">
               Revenue & Net Income
@@ -273,10 +322,12 @@ export default function Dashboard() {
                 <Tooltip
                   contentStyle={{
                     background: "#111827",
-                    border: "1px solid #1f2937",
+                    border: "1px solid #374151",
                     borderRadius: 8,
+                    color: "#f9fafb",
                   }}
-                  labelStyle={{ color: "#fff" }}
+                  labelStyle={{ color: "#f9fafb" }}
+                  itemStyle={{ color: "#93c5fd" }}
                 />
                 <Area
                   type="monotone"
@@ -298,7 +349,6 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
 
-          {/* Operating margin chart */}
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <h3 className="text-white font-semibold mb-1">Operating Margin</h3>
             <p className="text-gray-500 text-xs mb-4">Quarterly — percentage</p>
@@ -313,10 +363,12 @@ export default function Dashboard() {
                 <Tooltip
                   contentStyle={{
                     background: "#111827",
-                    border: "1px solid #1f2937",
+                    border: "1px solid #374151",
                     borderRadius: 8,
+                    color: "#f9fafb",
                   }}
-                  labelStyle={{ color: "#fff" }}
+                  labelStyle={{ color: "#f9fafb" }}
+                  itemStyle={{ color: "#93c5fd" }}
                   formatter={(v: number) => [`${v}%`, "Operating Margin"]}
                 />
                 <Bar
@@ -324,15 +376,15 @@ export default function Dashboard() {
                   fill="#3b82f6"
                   radius={[4, 4, 0, 0]}
                   name="Operating Margin"
+                  activeBar={{ fill: "#1e3a5f", stroke: "none" }}
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        {/* Risk drivers + latest quarter */}
+        {/* Risk drivers + history */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top risk drivers */}
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <h3 className="text-white font-semibold mb-1">Top Risk Drivers</h3>
             <p className="text-gray-500 text-xs mb-4">
@@ -362,7 +414,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Risk history */}
           <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
             <h3 className="text-white font-semibold mb-1">Risk History</h3>
             <p className="text-gray-500 text-xs mb-4">All quarters</p>
@@ -401,7 +452,140 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Alert if any high risk */}
+        {/* EPAM Health Panel */}
+        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-white font-semibold">
+                {primary_display_name} Data Health
+              </h3>
+              <p className="text-gray-500 text-xs mt-0.5">
+                Live monitoring status
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-green-400 text-xs font-medium">Live</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Data freshness */}
+            <div className="bg-gray-800 rounded-xl p-4">
+              <p className="text-gray-400 text-xs mb-2">Latest Quarter</p>
+              <p className="text-white font-bold">
+                {latest?.quarter_date?.split("T")[0] ?? "N/A"}
+              </p>
+              <p className="text-green-400 text-xs mt-1">● Current</p>
+            </div>
+
+            {/* Quarters tracked */}
+            <div className="bg-gray-800 rounded-xl p-4">
+              <p className="text-gray-400 text-xs mb-2">Quarters Tracked</p>
+              <p className="text-white font-bold">{quarters.length}</p>
+              <p className="text-gray-500 text-xs mt-1">
+                Since{" "}
+                {quarters[0]?.quarter_date?.split("T")[0]?.slice(0, 7) ?? "N/A"}
+              </p>
+            </div>
+
+            {/* QoQ revenue change */}
+            <div className="bg-gray-800 rounded-xl p-4">
+              <p className="text-gray-400 text-xs mb-2">Revenue QoQ</p>
+              <p
+                className={`font-bold ${revChange && parseFloat(revChange) > 0 ? "text-green-400" : "text-red-400"}`}
+              >
+                {revChange
+                  ? `${parseFloat(revChange) > 0 ? "+" : ""}${revChange}%`
+                  : "N/A"}
+              </p>
+              <p className="text-gray-500 text-xs mt-1">vs previous quarter</p>
+            </div>
+
+            {/* Next refresh */}
+            <div className="bg-gray-800 rounded-xl p-4">
+              <p className="text-gray-400 text-xs mb-2">Auto-Refresh</p>
+              <p className="text-white font-bold">Daily</p>
+              <p className="text-gray-500 text-xs mt-1">Every day at 6:00 AM</p>
+            </div>
+          </div>
+
+          {/* QoQ margin change */}
+          {latest && previous && (
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {[
+                {
+                  label: "Operating Margin",
+                  current: latest.operating_margin,
+                  previous: previous.operating_margin,
+                },
+                {
+                  label: "Current Ratio",
+                  current: latest.current_ratio,
+                  previous: previous.current_ratio,
+                  isRatio: true,
+                },
+                {
+                  label: "Risk Level",
+                  current: null,
+                  previous: null,
+                  custom: (
+                    <div className="flex items-center gap-2 mt-1">
+                      <span
+                        className="text-xs font-medium px-2 py-0.5 rounded-full"
+                        style={{
+                          color: latest.risk_color,
+                          background: latest.risk_color + "20",
+                        }}
+                      >
+                        {riskLabel(latest.risk_label)}
+                      </span>
+                      <span className="text-gray-500 text-xs">
+                        {(latest.confidence * 100).toFixed(1)}% confidence
+                      </span>
+                    </div>
+                  ),
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="bg-gray-800/50 rounded-xl p-3 border border-gray-700/50"
+                >
+                  <p className="text-gray-400 text-xs mb-1">{item.label}</p>
+                  {item.custom ? (
+                    item.custom
+                  ) : (
+                    <>
+                      <p className="text-white font-semibold text-sm">
+                        {item.isRatio
+                          ? parseFloat(String(item.current ?? 0)).toFixed(2)
+                          : formatPct(item.current)}
+                      </p>
+                      {item.current != null && item.previous != null && (
+                        <p
+                          className={`text-xs mt-0.5 ${
+                            parseFloat(String(item.current)) >=
+                            parseFloat(String(item.previous))
+                              ? "text-green-400"
+                              : "text-red-400"
+                          }`}
+                        >
+                          {parseFloat(String(item.current)) >=
+                          parseFloat(String(item.previous))
+                            ? "▲"
+                            : "▼"}{" "}
+                          vs prev quarter
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* High risk alert */}
         {quarters.some((q) => q.risk_label === "high_risk") && (
           <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
             <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />

@@ -17,6 +17,7 @@ __pycache__/
 *.pkl
 *.parquet
 venv/
+.venv
 .env
 data/
 models/

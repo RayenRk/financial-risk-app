@@ -122,5 +122,10 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+    
+    /////////
+    
+    'primary_ticker'       => env('PRIMARY_COMPANY_TICKER', 'EPAM'),
+    'primary_display_name' => env('PRIMARY_COMPANY_DISPLAY_NAME', 'TACTIC'),
 
 ];

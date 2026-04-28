@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Dark themed scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Hide scrollbar on sidebar nav */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Fix Recharts white hover highlight globally */
+.recharts-bar-rectangle:hover path,
+.recharts-bar-rectangle.recharts-bar-rectangle-active path {
+  fill-opacity: 0.8;
+}
+
+.recharts-active-bar path {
+  fill-opacity: 0.8 !important;
+}
+
+.recharts-area-dot {
+  fill: #111827;
+}
+
+.recharts-tooltip-cursor {
+  fill: rgba(255, 255, 255, 0.05) !important;
+}
