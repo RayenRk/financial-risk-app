@@ -10,12 +10,14 @@ import Alerts from "./pages/Alerts.tsx";
 import Users from "./pages/Users.tsx";
 import Analyze from "./pages/Analyze.tsx";
 import CompanyDetail from "./pages/CompanyDetail.tsx";
+import ToastNotifications from "./components/ToastNotifications.tsx";
 
 export default function App() {
   return (
     <AuthProvider>
       <ConfigProvider>
         <BrowserRouter>
+          <ToastNotifications />
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route

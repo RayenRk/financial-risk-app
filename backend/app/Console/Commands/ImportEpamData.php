@@ -8,6 +8,7 @@ use App\Models\Quarter;
 use App\Models\RiskPrediction;
 use App\Models\User;
 use App\Models\UserCompanyWatchlist;
+use App\Notifications\RiskAlertNotification;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 class ImportEpamData extends Command
 {
     protected $signature   = 'epam:import {--force : Force re-import even if data is current}';
-    protected $description = 'Fetch latest EPAM financial data from FastAPI, score it, and update the database.';
+    protected $description = 'Fetch latest EPAM data, score it, update DB. Sends alerts on risk changes.';
 
     private string $fastApiUrl = 'http://localhost:8001';
 
@@ -24,36 +25,34 @@ class ImportEpamData extends Command
         $this->info('Starting EPAM data import...');
         $start = now();
 
-        // ── 1. Call FastAPI analyze endpoint ───────────────────────────────
+        // ── 1. Call FastAPI ────────────────────────────────────────────────
         $this->line('  → Fetching EPAM data from FastAPI...');
         try {
             $response = Http::timeout(60)->post("{$this->fastApiUrl}/analyze", [
-                'ticker' => config('app.primary_ticker'),
+                'ticker' => config('app.primary_ticker', 'EPAM'),
             ]);
-
             if ($response->failed()) {
-                $this->error('FastAPI returned an error: ' . $response->body());
+                $this->error('FastAPI error: ' . $response->body());
                 return Command::FAILURE;
             }
         } catch (\Exception $e) {
-            $this->error('Could not connect to FastAPI microservice: ' . $e->getMessage());
-            $this->line('  Make sure FastAPI is running: uvicorn main:app --port 8001');
+            $this->error('Could not connect to FastAPI: ' . $e->getMessage());
             return Command::FAILURE;
         }
 
-        $data    = $response->json();
-        $company = $data['company'];
+        $data     = $response->json();
+        $company  = $data['company'];
         $quarters = $data['quarters'];
         $analysis = $data['analysis'];
 
         $this->line("  → Data quality: {$analysis['data_quality']}% ({$analysis['data_quality_note']})");
-        $this->line("  → Quarters available: {$analysis['total_quarters']}");
+        $this->line("  → Quarters: {$analysis['total_quarters']}");
 
         // ── 2. Upsert company ──────────────────────────────────────────────
         $companyModel = Company::updateOrCreate(
-            ['ticker' => config('app.primary_ticker')],
+            ['ticker' => config('app.primary_ticker', 'EPAM')],
             [
-                'name' => config('app.primary_display_name'),
+                'name'        => config('app.primary_display_name', $company['name']),
                 'sector'      => $company['sector'],
                 'industry'    => $company['industry'] ?? null,
                 'country'     => $company['country'] ?? null,
@@ -67,7 +66,7 @@ class ImportEpamData extends Command
 
         $this->line("  → Company: {$companyModel->name} (ID: {$companyModel->id})");
 
-        // ── 3. Add to all user watchlists ──────────────────────────────────
+        // ── 3. Add to watchlists ───────────────────────────────────────────
         User::all()->each(function ($user) use ($companyModel) {
             UserCompanyWatchlist::firstOrCreate(
                 ['user_id' => $user->id, 'company_id' => $companyModel->id],
@@ -75,29 +74,31 @@ class ImportEpamData extends Command
             );
         });
 
-        // ── 4. Import quarters + predictions ──────────────────────────────
-        $newQuarters    = 0;
-        $updatedQuarters = 0;
-        $newAlerts      = 0;
-        $previousLabel  = $this->getPreviousRiskLabel($companyModel->id);
+        // ── 4. Get previous risk before importing ──────────────────────────
+        $previousLabel    = $this->getPreviousRiskLabel($companyModel->id);
+        $newQuarters      = 0;
+        $updatedQuarters  = 0;
+        $newAlerts        = 0;
+        $riskChanged      = false;
+        $latestQuarter    = null;
+        $latestPrediction = null;
 
+        // Identify latest quarter date to restrict alerts to latest only
+        $latestDate = !empty($quarters) ? end($quarters)['date'] : null;
+
+        // ── 5. Import quarters loop ────────────────────────────────────────
         foreach ($quarters as $q) {
-            $quarterDate = $q['date'];
 
-            // Check if quarter already exists
             $existing = Quarter::where('company_id', $companyModel->id)
-                ->where('quarter_date', $quarterDate)
-                ->first();
+                ->where('quarter_date', $q['date'])->first();
 
             if ($existing && !$this->option('force')) {
-                // Quarter exists — skip unless forced
-                $previousLabel = $q['risk_label'];
                 continue;
             }
 
             // Upsert quarter
             $quarter = Quarter::updateOrCreate(
-                ['company_id' => $companyModel->id, 'quarter_date' => $quarterDate],
+                ['company_id' => $companyModel->id, 'quarter_date' => $q['date']],
                 [
                     'revenue'            => $q['revenue'],
                     'gross_profit'       => $q['gross_profit'],
@@ -109,7 +110,7 @@ class ImportEpamData extends Command
                     'gross_margin'       => $q['gross_margin'],
                     'operating_margin'   => $q['operating_margin'],
                     'net_margin'         => $q['net_margin'],
-                    'fcf_margin'         => $q['fcf_margin'],
+                    'fcf_margin'         => $q['fcf_margin'] ?? null,
                     'roe'                => $q['roe'],
                     'roa'                => $q['roa'],
                     'debt_to_equity'     => $q['debt_to_equity'],
@@ -122,8 +123,8 @@ class ImportEpamData extends Command
 
             $existing ? $updatedQuarters++ : $newQuarters++;
 
-            // Upsert risk prediction
-            RiskPrediction::updateOrCreate(
+            // Upsert prediction
+            $prediction = RiskPrediction::updateOrCreate(
                 ['quarter_id' => $quarter->id, 'model_version' => '1.0.0'],
                 [
                     'company_id'       => $companyModel->id,
@@ -137,109 +138,146 @@ class ImportEpamData extends Command
                 ]
             );
 
-            // ── 5. Generate alerts ─────────────────────────────────────────
-            $currentLabel = $q['risk_label'];
-            $users        = User::all();
+            $latestQuarter    = $quarter;
+            $latestPrediction = $prediction;
+            $currentLabel     = $q['risk_label'];
+            $users            = User::all();
+            $isLatestQuarter  = $q['date'] === $latestDate;
 
-            // High risk alert
-            if ($currentLabel === 'high_risk') {
+            // ── High risk alert — latest quarter only ──────────────────────
+            if ($currentLabel === 'high_risk' && $isLatestQuarter) {
                 foreach ($users as $user) {
-                    $created = Alert::firstOrCreate(
-                        ['company_id' => $companyModel->id, 'quarter_id' => $quarter->id,
-                         'user_id' => $user->id, 'type' => 'high_risk_detected'],
-                        [
-                            'severity'     => 'critical',
-                            'message'      => "{$companyModel->name} flagged as HIGH RISK for {$quarterDate}. Confidence: " . round($q['confidence'] * 100) . "%.",
-                            'is_read'      => false,
-                            'triggered_at' => now(),
-                        ]
-                    );
-                    if ($created->wasRecentlyCreated) $newAlerts++;
+                    Alert::where('company_id', $companyModel->id)
+                        ->where('quarter_id', $quarter->id)
+                        ->where('user_id', $user->id)
+                        ->where('type', 'high_risk_detected')
+                        ->delete();
+
+                    Alert::create([
+                        'company_id'   => $companyModel->id,
+                        'quarter_id'   => $quarter->id,
+                        'user_id'      => $user->id,
+                        'type'         => 'high_risk_detected',
+                        'severity'     => 'critical',
+                        'message'      => "{$companyModel->name} flagged as HIGH RISK for {$q['date']}. Confidence: " . round($q['confidence'] * 100) . "%.",
+                        'is_read'      => false,
+                        'triggered_at' => now(),
+                    ]);
+                    $newAlerts++;
                 }
             }
 
-            // Risk change alert
-            if ($previousLabel && $previousLabel !== $currentLabel) {
+            // ── Risk change alert — latest quarter only ────────────────────
+            if ($previousLabel && $previousLabel !== $currentLabel && $isLatestQuarter) {
                 $riskLevels = ['low_risk' => 1, 'medium_risk' => 2, 'high_risk' => 3];
-                $increased  = $riskLevels[$currentLabel] > $riskLevels[$previousLabel];
+                $increased  = ($riskLevels[$currentLabel] ?? 0) > ($riskLevels[$previousLabel] ?? 0);
                 $type       = $increased ? 'risk_increased' : 'risk_decreased';
                 $severity   = $increased ? 'warning' : 'info';
                 $message    = $increased
-                    ? "{$companyModel->name} risk increased from {$previousLabel} to {$currentLabel} in {$quarterDate}."
-                    : "{$companyModel->name} risk improved from {$previousLabel} to {$currentLabel} in {$quarterDate}.";
+                    ? "{$companyModel->name} risk increased from {$previousLabel} to {$currentLabel} in {$q['date']}."
+                    : "{$companyModel->name} risk improved from {$previousLabel} to {$currentLabel} in {$q['date']}.";
 
                 foreach ($users as $user) {
-                    $created = Alert::firstOrCreate(
-                        ['company_id' => $companyModel->id, 'quarter_id' => $quarter->id,
-                         'user_id' => $user->id, 'type' => $type],
-                        [
-                            'severity'     => $severity,
-                            'message'      => $message,
-                            'is_read'      => false,
-                            'triggered_at' => now(),
-                        ]
-                    );
-                    if ($created->wasRecentlyCreated) $newAlerts++;
+                    Alert::where('company_id', $companyModel->id)
+                        ->where('quarter_id', $quarter->id)
+                        ->where('user_id', $user->id)
+                        ->where('type', $type)
+                        ->delete();
+
+                    Alert::create([
+                        'company_id'   => $companyModel->id,
+                        'quarter_id'   => $quarter->id,
+                        'user_id'      => $user->id,
+                        'type'         => $type,
+                        'severity'     => $severity,
+                        'message'      => $message,
+                        'is_read'      => false,
+                        'triggered_at' => now(),
+                    ]);
+                    $newAlerts++;
+                }
+
+                $riskChanged = true;
+            }
+
+        } // ← end foreach quarters
+
+        // ── 6. Send email notification on risk change ──────────────────────
+        if ($riskChanged && $latestQuarter && $latestPrediction) {
+            $this->line('  → Risk changed — sending notifications...');
+
+            $currentLabel = $latestPrediction->risk_label;
+            $riskLevels   = ['low_risk' => 1, 'medium_risk' => 2, 'high_risk' => 3];
+            $increased    = ($riskLevels[$currentLabel] ?? 0) > ($riskLevels[$previousLabel] ?? 0);
+            $severity     = $currentLabel === 'high_risk' ? 'critical' : ($increased ? 'warning' : 'info');
+            $message      = $increased
+                ? "{$companyModel->name} risk increased from {$previousLabel} to {$currentLabel}."
+                : "{$companyModel->name} risk improved from {$previousLabel} to {$currentLabel}.";
+
+            $watchingUsers = User::where('role', 'admin')
+                ->whereHas('watchlist', function ($q) use ($companyModel) {
+                    $q->where('company_id', $companyModel->id)
+                      ->where('notify_on_change', true);
+                })->get();
+
+            foreach ($watchingUsers as $index => $user) {
+                try {
+                    $user->notify(new RiskAlertNotification(
+                        companyName:  $companyModel->name,
+                        ticker:       config('app.primary_ticker', 'EPAM'),
+                        previousRisk: $previousLabel,
+                        currentRisk:  $currentLabel,
+                        quarterDate:  $latestQuarter->quarter_date,
+                        confidence:   (float) $latestPrediction->confidence,
+                        topDrivers:   $latestPrediction->top_risk_drivers ?? [],
+                        severity:     $severity,
+                        message:      $message,
+                    ));
+                    $this->info("  → Email sent to {$user->email}");
+                } catch (\Exception $e) {
+                    $this->warn("  → Email failed for {$user->email}: " . $e->getMessage());
+                    Log::warning('Risk alert email failed', [
+                        'user'  => $user->email,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+
+                if ($index < $watchingUsers->count() - 1) {
+                    sleep(3);
                 }
             }
 
-            // Negative margin alert
-            if (isset($q['operating_margin']) && $q['operating_margin'] !== null && $q['operating_margin'] < 0) {
-                foreach ($users as $user) {
-                    $created = Alert::firstOrCreate(
-                        ['company_id' => $companyModel->id, 'quarter_id' => $quarter->id,
-                         'user_id' => $user->id, 'type' => 'negative_margin'],
-                        [
-                            'severity'     => 'warning',
-                            'message'      => "{$companyModel->name} reported negative operating margin (" . round($q['operating_margin'] * 100, 1) . "%) in {$quarterDate}.",
-                            'is_read'      => false,
-                            'triggered_at' => now(),
-                        ]
-                    );
-                    if ($created->wasRecentlyCreated) $newAlerts++;
-                }
-            }
-
-            $previousLabel = $currentLabel;
+            $this->info("  → Notifications sent to {$watchingUsers->count()} users");
         }
 
-        // ── 6. Summary ─────────────────────────────────────────────────────
-        $elapsed = now()->diffInSeconds($start);
+        // ── 7. Summary ─────────────────────────────────────────────────────
+        $elapsed = abs(now()->diffInSeconds($start));
         $this->newLine();
         $this->info('✅ EPAM import complete!');
         $this->table(
             ['Metric', 'Value'],
             [
-                ['New quarters',    $newQuarters],
+                ['New quarters',     $newQuarters],
                 ['Updated quarters', $updatedQuarters],
-                ['New alerts',      $newAlerts],
-                ['Latest risk',     $analysis['latest_risk']],
-                ['Data quality',    $analysis['data_quality'] . '%'],
-                ['Elapsed',         $elapsed . 's'],
+                ['New alerts',       $newAlerts],
+                ['Risk changed',     $riskChanged ? 'Yes — notifications sent' : 'No'],
+                ['Latest risk',      $analysis['latest_risk']],
+                ['Data quality',     $analysis['data_quality'] . '%'],
+                ['Elapsed',          $elapsed . 's'],
             ]
         );
-
-        Log::info('EPAM import completed', [
-            'new_quarters'     => $newQuarters,
-            'updated_quarters' => $updatedQuarters,
-            'new_alerts'       => $newAlerts,
-            'latest_risk'      => $analysis['latest_risk'],
-            'data_quality'     => $analysis['data_quality'],
-        ]);
 
         return Command::SUCCESS;
     }
 
     private function getPreviousRiskLabel(int $companyId): ?string
     {
-        $latest = RiskPrediction::whereHas('quarter', function ($q) use ($companyId) {
-            $q->where('company_id', $companyId);
-        })->orderByDesc(
+        return RiskPrediction::whereHas('quarter', fn($q) =>
+            $q->where('company_id', $companyId)
+        )->orderByDesc(
             Quarter::select('quarter_date')
                 ->whereColumn('quarters.id', 'risk_predictions.quarter_id')
                 ->limit(1)
-        )->first();
-
-        return $latest?->risk_label;
+        )->first()?->risk_label;
     }
 }

@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext.tsx";
 import { useConfig } from "../context/ConfigContext.tsx";
+import { useUnreadAlertCount } from "./ToastNotifications.tsx";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -29,6 +30,7 @@ export default function Sidebar() {
   const { primary_display_name, primary_ticker } = useConfig();
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const unreadCount = useUnreadAlertCount();
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [showCompanies, setShowCompanies] = useState(false);
@@ -41,11 +43,15 @@ export default function Sidebar() {
     { to: "/analyze", icon: Search, label: "Analyze Company" },
   ];
 
-  useEffect(() => {
+  const fetchCompanies = () => {
     api
       .get("/companies")
       .then((res) => setCompanies(res.data.companies ?? []))
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchCompanies();
   }, []);
 
   const handleLogout = async () => {
@@ -58,6 +64,10 @@ export default function Sidebar() {
       className="w-2 h-2 rounded-full shrink-0"
       style={{ background: color ?? "#6b7280" }}
     />
+  );
+
+  const nonPrimaryCompanies = companies.filter(
+    (c) => c.ticker !== primary_ticker,
   );
 
   return (
@@ -84,7 +94,7 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 mt-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 mt-4 space-y-1 overflow-y-auto scrollbar-none">
         {navItems.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -99,9 +109,16 @@ export default function Sidebar() {
           >
             <Icon className="w-4 h-4" />
             {label}
+            {/* Unread badge — Alerts only */}
+            {to === "/alerts" && unreadCount > 0 && (
+              <span className="ml-auto bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center leading-none">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </NavLink>
         ))}
 
+        {/* Admin only — Users */}
         {isAdmin() && (
           <NavLink
             to="/users"
@@ -118,7 +135,8 @@ export default function Sidebar() {
           </NavLink>
         )}
 
-        {companies.length > 0 && (
+        {/* Analyzed companies */}
+        {nonPrimaryCompanies.length > 0 && (
           <div className="mt-4">
             <button
               onClick={() => setShowCompanies(!showCompanies)}
@@ -127,7 +145,7 @@ export default function Sidebar() {
               <div className="flex items-center gap-2">
                 <Building2 className="w-3 h-3" />
                 <span className="text-xs uppercase tracking-wider font-medium">
-                  Analyzed ({companies.length})
+                  Analyzed ({nonPrimaryCompanies.length})
                 </span>
               </div>
               {showCompanies ? (
@@ -139,7 +157,7 @@ export default function Sidebar() {
 
             {showCompanies && (
               <div className="mt-1 space-y-0.5">
-                {companies.map((c) => (
+                {nonPrimaryCompanies.map((c) => (
                   <button
                     key={c.id}
                     onClick={() => navigate(`/companies/${c.ticker}`)}

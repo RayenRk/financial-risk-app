@@ -128,4 +128,6 @@ return [
     'primary_ticker'       => env('PRIMARY_COMPANY_TICKER', 'EPAM'),
     'primary_display_name' => env('PRIMARY_COMPANY_DISPLAY_NAME', 'TACTIC'),
 
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+
 ];

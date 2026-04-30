@@ -64,6 +64,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/analyze',           [AnalyzeController::class, 'analyze']);
     Route::get('/companies',          [AnalyzeController::class, 'index']);
     Route::get('/companies/{ticker}', [AnalyzeController::class, 'show']);
+    // Delete analyzed company (non-primary only)
+    Route::delete('/companies/{id}', [AnalyzeController::class, 'destroy']);
 
     // Admin only
     Route::middleware('role:admin')->group(function () {
