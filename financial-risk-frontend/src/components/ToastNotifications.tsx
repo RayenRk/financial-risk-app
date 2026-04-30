@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { X, AlertTriangle, Info, ShieldAlert } from "lucide-react";
 import api from "../api/axios.ts";
+import { useRefresh } from "../context/RefreshContext.tsx";
+import { useNavigate } from "react-router-dom";
 
 interface ToastAlert {
   id: number;
@@ -53,9 +55,10 @@ const typeLabel = (type: string) => {
 };
 
 export default function ToastNotifications() {
+  const { refresh } = useRefresh();
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const shownIds = useRef<Set<number>>(new Set()); // ← tracks which alert IDs already shown
+  const shownIds = useRef<Set<number>>(new Set());
+  const navigate = useNavigate();
 
   const dismiss = (toastId: string) => {
     setToasts((prev) => prev.filter((t) => t.toastId !== toastId));
@@ -66,15 +69,11 @@ export default function ToastNotifications() {
       const res = await api.get("/alerts/unread");
       const alerts = (res.data.alerts ?? []) as ToastAlert[];
 
-      setUnreadCount(alerts.length);
-
-      // Only show alerts we haven't shown yet
+      // Only show alerts not yet shown
       const newAlerts = alerts.filter((a) => !shownIds.current.has(a.id));
 
       if (newAlerts.length > 0) {
-        // Mark all as shown immediately
         newAlerts.forEach((a) => shownIds.current.add(a.id));
-
         setToasts((prev) => [
           ...prev,
           ...newAlerts.map((a) => ({
@@ -82,16 +81,18 @@ export default function ToastNotifications() {
             toastId: `toast-${a.id}`,
           })),
         ]);
+        // Trigger global refresh so all pages update
+        refresh();
       }
     } catch {
       // silent
     }
-  }, []);
+  }, [refresh]);
 
-  // Poll every 60 seconds (change to 5000 for testing)
+  // Poll every 60 seconds
   useEffect(() => {
     checkForNewAlerts();
-    const interval = setInterval(checkForNewAlerts, 5000);
+    const interval = setInterval(checkForNewAlerts, 60000);
     return () => clearInterval(interval);
   }, [checkForNewAlerts]);
 
@@ -113,8 +114,12 @@ export default function ToastNotifications() {
         return (
           <div
             key={toast.toastId}
-            className={`flex items-start gap-3 p-4 rounded-xl border shadow-2xl backdrop-blur-sm ${style.border} ${style.bg}`}
+            className={`flex items-start gap-3 p-4 rounded-xl border shadow-2xl backdrop-blur-sm cursor-pointer ${style.border} ${style.bg}`}
             style={{ animation: "slideIn 0.3s ease-out" }}
+            onClick={() => {
+              dismiss(toast.toastId);
+              navigate("/alerts");
+            }}
           >
             <div className="mt-0.5">{style.icon}</div>
             <div className="flex-1 min-w-0">
@@ -136,7 +141,10 @@ export default function ToastNotifications() {
               </p>
             </div>
             <button
-              onClick={() => dismiss(toast.toastId)}
+              onClick={(e) => {
+                e.stopPropagation();
+                dismiss(toast.toastId);
+              }}
               className="shrink-0 text-gray-500 hover:text-white transition-colors mt-0.5"
             >
               <X className="w-4 h-4" />
@@ -144,7 +152,6 @@ export default function ToastNotifications() {
           </div>
         );
       })}
-
       <style>{`
         @keyframes slideIn {
           from { transform: translateX(100%); opacity: 0; }
@@ -153,25 +160,4 @@ export default function ToastNotifications() {
       `}</style>
     </div>
   );
-}
-
-// Hook for sidebar unread badge
-export function useUnreadAlertCount() {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const res = await api.get("/alerts/unread");
-        setCount(res.data.count ?? 0);
-      } catch {
-        /* silent */
-      }
-    };
-    fetch();
-    const interval = setInterval(fetch, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  return count;
 }

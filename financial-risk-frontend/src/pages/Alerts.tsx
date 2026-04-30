@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Layout from "../components/Layout.tsx";
 import api from "../api/axios.ts";
+import { useRefresh } from "../context/RefreshContext.tsx";
 
 interface Alert {
   id: number;
@@ -23,43 +24,34 @@ interface Alert {
   quarter_date: string;
 }
 
-const severityIcon = (severity: string) => {
-  switch (severity) {
-    case "critical":
-      return <AlertTriangle className="w-4 h-4 text-red-400" />;
-    case "warning":
-      return <AlertTriangle className="w-4 h-4 text-yellow-400" />;
-    default:
-      return <Info className="w-4 h-4 text-blue-400" />;
-  }
+const severityIcon = (s: string) => {
+  if (s === "critical")
+    return <AlertTriangle className="w-4 h-4 text-red-400" />;
+  if (s === "warning")
+    return <AlertTriangle className="w-4 h-4 text-yellow-400" />;
+  return <Info className="w-4 h-4 text-blue-400" />;
 };
 
-const severityBadge = (severity: string) => {
-  switch (severity) {
-    case "critical":
-      return "bg-red-500/15 text-red-400 border-red-500/30";
-    case "warning":
-      return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
-    default:
-      return "bg-blue-500/15 text-blue-400 border-blue-500/30";
-  }
+const severityBadge = (s: string) => {
+  if (s === "critical") return "bg-red-500/15 text-red-400 border-red-500/30";
+  if (s === "warning")
+    return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
+  return "bg-blue-500/15 text-blue-400 border-blue-500/30";
 };
 
-const typeLabel = (type: string) => {
-  const map: Record<string, string> = {
+const typeLabel = (type: string) =>
+  ({
     high_risk_detected: "High Risk Detected",
     risk_increased: "Risk Increased",
     risk_decreased: "Risk Decreased",
     negative_margin: "Negative Margin",
     low_liquidity: "Low Liquidity",
     high_leverage: "High Leverage",
-  };
-  return map[type] ?? type;
-};
+  })[type] ?? type;
 
-const formatDate = (dateStr: string) => {
+const formatDate = (d: string) => {
   try {
-    return new Date(dateStr).toLocaleDateString("en-US", {
+    return new Date(d).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -67,11 +59,12 @@ const formatDate = (dateStr: string) => {
       minute: "2-digit",
     });
   } catch {
-    return dateStr;
+    return d;
   }
-};  
+};
 
 export default function Alerts() {
+  const { lastUpdated, refresh } = useRefresh();
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [filter, setFilter] = useState<
     "all" | "unread" | "critical" | "warning" | "info"
@@ -98,12 +91,18 @@ export default function Alerts() {
     fetchAlerts();
   }, []);
 
+  // Auto-refresh when global refresh fires (toast appeared or poll triggered)
+  useEffect(() => {
+    if (lastUpdated) fetchAlerts(true);
+  }, [lastUpdated]);
+
   const markRead = async (id: number) => {
     try {
       await api.patch(`/alerts/${id}/read`);
       setAlerts((prev) =>
         prev.map((a) => (a.id === id ? { ...a, is_read: true } : a)),
       );
+      refresh(); // ← update sidebar badge
     } catch {
       /* silent */
     }
@@ -114,6 +113,7 @@ export default function Alerts() {
     try {
       await api.patch("/alerts/read-all");
       setAlerts((prev) => prev.map((a) => ({ ...a, is_read: true })));
+      refresh(); // ← update sidebar badge
     } finally {
       setMarkingAll(false);
     }
@@ -126,7 +126,6 @@ export default function Alerts() {
     if (filter === "info") return a.severity === "info";
     return true;
   });
-
   const unreadCount = alerts.filter((a) => !a.is_read).length;
   const criticalCount = alerts.filter((a) => a.severity === "critical").length;
   const warningCount = alerts.filter((a) => a.severity === "warning").length;
@@ -207,13 +206,13 @@ export default function Alerts() {
               color: "text-yellow-400",
               bg: "bg-yellow-500/10",
             },
-          ].map((card) => (
+          ].map((c) => (
             <div
-              key={card.label}
-              className={`${card.bg} border border-gray-800 rounded-xl p-4`}
+              key={c.label}
+              className={`${c.bg} border border-gray-800 rounded-xl p-4`}
             >
-              <p className="text-gray-400 text-xs mb-1">{card.label}</p>
-              <p className={`text-2xl font-bold ${card.color}`}>{card.value}</p>
+              <p className="text-gray-400 text-xs mb-1">{c.label}</p>
+              <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
             </div>
           ))}
         </div>
@@ -241,7 +240,6 @@ export default function Alerts() {
           ))}
         </div>
 
-        {/* Alert list */}
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
         {filtered.length === 0 ? (
@@ -261,19 +259,12 @@ export default function Alerts() {
             {filtered.map((alert) => (
               <div
                 key={alert.id}
-                className={`bg-gray-900 border rounded-xl p-5 transition-all ${
-                  alert.is_read
-                    ? "border-gray-800 opacity-70"
-                    : "border-gray-700"
-                }`}
+                className={`bg-gray-900 border rounded-xl p-5 transition-all ${alert.is_read ? "border-gray-800 opacity-70" : "border-gray-700"}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1">
-                    {/* Severity icon */}
                     <div className="mt-0.5">{severityIcon(alert.severity)}</div>
-
                     <div className="flex-1 min-w-0">
-                      {/* Top row */}
                       <div className="flex items-center gap-2 flex-wrap mb-1">
                         <span
                           className={`text-xs font-medium px-2 py-0.5 rounded-full border ${severityBadge(alert.severity)}`}
@@ -287,13 +278,9 @@ export default function Alerts() {
                           <span className="w-2 h-2 bg-blue-500 rounded-full" />
                         )}
                       </div>
-
-                      {/* Message */}
                       <p className="text-white text-sm leading-relaxed">
                         {alert.message}
                       </p>
-
-                      {/* Meta */}
                       <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
                         <span>{alert.company?.ticker ?? "EPAM"}</span>
                         <span>·</span>
@@ -311,15 +298,12 @@ export default function Alerts() {
                       </div>
                     </div>
                   </div>
-
-                  {/* Mark read button */}
                   {!alert.is_read && (
                     <button
                       onClick={() => markRead(alert.id)}
                       className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-lg text-xs transition-colors"
                     >
-                      <Bell className="w-3 h-3" />
-                      Mark read
+                      <Bell className="w-3 h-3" /> Mark read
                     </button>
                   )}
                 </div>

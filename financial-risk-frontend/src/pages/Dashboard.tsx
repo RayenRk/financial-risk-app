@@ -24,6 +24,7 @@ import Layout from "../components/Layout.tsx";
 import api from "../api/axios.ts";
 import { useAuth } from "../context/AuthContext.tsx";
 import { useConfig } from "../context/ConfigContext.tsx";
+import { useRefresh } from "../context/RefreshContext.tsx";
 
 interface Company {
   id: number;
@@ -92,6 +93,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<string>("None");
+  const { lastUpdated, refresh } = useRefresh();
 
   const fetchData = async () => {
     try {
@@ -116,9 +118,9 @@ export default function Dashboard() {
     try {
       await api.post("/epam/refresh");
       await fetchData();
+      refresh();
       setLastRefresh(new Date().toLocaleTimeString());
     } catch {
-      // silent
     } finally {
       setRefreshing(false);
     }
@@ -127,6 +129,11 @@ export default function Dashboard() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Auto-refresh when global refresh fires (toast appeared or poll triggered)
+  useEffect(() => {
+    if (lastUpdated) fetchData();
+  }, [lastUpdated]);
 
   if (loading)
     return (

@@ -10,76 +10,79 @@ import Alerts from "./pages/Alerts.tsx";
 import Users from "./pages/Users.tsx";
 import Analyze from "./pages/Analyze.tsx";
 import CompanyDetail from "./pages/CompanyDetail.tsx";
+import { RefreshProvider } from "./context/RefreshContext.tsx";
 import ToastNotifications from "./components/ToastNotifications.tsx";
 
 export default function App() {
   return (
     <AuthProvider>
       <ConfigProvider>
-        <BrowserRouter>
-          <ToastNotifications />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/financials"
-              element={
-                <ProtectedRoute>
-                  <Financials />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/risk"
-              element={
-                <ProtectedRoute>
-                  <RiskAnalysis />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/alerts"
-              element={
-                <ProtectedRoute>
-                  <Alerts />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/users"
-              element={
-                <ProtectedRoute adminOnly>
-                  <Users />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/analyze"
-              element={
-                <ProtectedRoute>
-                  <Analyze />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/companies/:ticker"
-              element={
-                <ProtectedRoute>
-                  <CompanyDetail />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </BrowserRouter>
+        <RefreshProvider>
+          <BrowserRouter>
+            <ToastNotifications />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/financials"
+                element={
+                  <ProtectedRoute>
+                    <Financials />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/risk"
+                element={
+                  <ProtectedRoute>
+                    <RiskAnalysis />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/alerts"
+                element={
+                  <ProtectedRoute>
+                    <Alerts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/users"
+                element={
+                  <ProtectedRoute adminOnly>
+                    <Users />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/analyze"
+                element={
+                  <ProtectedRoute>
+                    <Analyze />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/companies/:ticker"
+                element={
+                  <ProtectedRoute>
+                    <CompanyDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </RefreshProvider>
       </ConfigProvider>
     </AuthProvider>
   );

@@ -2,7 +2,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext.tsx";
 import { useConfig } from "../context/ConfigContext.tsx";
-import { useUnreadAlertCount } from "./ToastNotifications.tsx";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -17,6 +16,7 @@ import {
   Building2,
 } from "lucide-react";
 import api from "../api/axios.ts";
+import { useRefresh } from "../context/RefreshContext.tsx";
 
 interface Company {
   id: number;
@@ -30,7 +30,7 @@ export default function Sidebar() {
   const { primary_display_name, primary_ticker } = useConfig();
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const unreadCount = useUnreadAlertCount();
+  const { unreadAlerts: unreadCount } = useRefresh();
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [showCompanies, setShowCompanies] = useState(false);
