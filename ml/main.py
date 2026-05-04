@@ -12,8 +12,6 @@ Endpoints:
 Run:
     uvicorn main:app --reload --port 8001
 
-Note: runs on port 8001 to avoid conflict with Laravel on 8000.
-
 Requirements:
     pip install fastapi uvicorn joblib pandas numpy yfinance shap scikit-learn xgboost
 """

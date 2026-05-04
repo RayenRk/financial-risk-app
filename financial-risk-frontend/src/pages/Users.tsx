@@ -9,6 +9,7 @@ import {
   Check,
   X,
   UserPlus,
+  ChevronDown,
 } from "lucide-react";
 import Layout from "../components/Layout.tsx";
 import api from "../api/axios.ts";
@@ -291,16 +292,19 @@ export default function Users() {
                     {/* Role */}
                     <td className="px-6 py-4">
                       {editId === user.id ? (
-                        <select
-                          value={editRole}
-                          onChange={(e) =>
-                            setEditRole(e.target.value as "admin" | "analyst")
-                          }
-                          className="bg-gray-800 border border-gray-600 text-white rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-blue-500"
-                        >
-                          <option value="analyst">Analyst</option>
-                          <option value="admin">Admin</option>
-                        </select>
+                        <div className="relative inline-block">
+                          <select
+                            value={editRole}
+                            onChange={(e) =>
+                              setEditRole(e.target.value as "admin" | "analyst")
+                            }
+                            className="appearance-none bg-gray-800 border border-gray-600 text-white rounded-lg pl-2 pr-6 py-1 text-xs focus:outline-none focus:border-blue-500 cursor-pointer [&>option]:bg-gray-800 [&>option]:text-white"
+                          >
+                            <option value="analyst">Analyst</option>
+                            <option value="admin">Admin</option>
+                          </select>
+                          <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+                        </div>
                       ) : (
                         <span
                           className={`text-xs font-medium px-2 py-0.5 rounded-full ${roleBadge(user.role)}`}
@@ -440,16 +444,19 @@ export default function Users() {
                 <label className="block text-sm font-medium text-gray-300 mb-2">
                   Role
                 </label>
-                <select
-                  value={newRole}
-                  onChange={(e) =>
-                    setNewRole(e.target.value as "admin" | "analyst")
-                  }
-                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors"
-                >
-                  <option value="analyst">Analyst</option>
-                  <option value="admin">Admin</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={newRole}
+                    onChange={(e) =>
+                      setNewRole(e.target.value as "admin" | "analyst")
+                    }
+                    className="w-full appearance-none bg-gray-800 border border-gray-700 rounded-xl pl-4 pr-10 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors cursor-pointer [&>option]:bg-gray-800 [&>option]:text-white"
+                  >
+                    <option value="analyst">Analyst</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                </div>
               </div>
               <div className="flex gap-3 pt-2">
                 <button

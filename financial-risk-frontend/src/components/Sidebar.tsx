@@ -185,14 +185,14 @@ export default function Sidebar() {
                     className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
                   >
                     <div
-                      className="flex items-center gap-2.5 flex-1 cursor-pointer"
+                      className="flex items-center gap-2.5 flex-1 min-w-0 cursor-pointer"
                       onClick={() => navigate(`/companies/${c.ticker}`)}
                     >
                       {riskDot(c.risk_color)}
                       <span className="font-mono text-xs text-gray-300 shrink-0">
                         {c.ticker}
                       </span>
-                      <span className="text-gray-500 text-xs truncate">
+                      <span className="text-gray-500 text-xs truncate min-w-0">
                         {c.name}
                       </span>
                     </div>
