@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AlertController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AnalyzeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ProfileController;
 
 // Public route — no auth needed
 Route::get('/config', function () {
@@ -44,6 +45,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/alerts/unread',      [AlertController::class, 'unread']);
     Route::patch('/alerts/{id}/read', [AlertController::class, 'markRead']);
     Route::patch('/alerts/read-all',  [AlertController::class, 'markAllRead']);
+        // Profile
+    Route::get('/profile',  [ProfileController::class, 'show']);
+    Route::patch('/profile', [ProfileController::class, 'update']);
+    
+    Route::delete('/companies/{id}', [AnalyzeController::class, 'destroy']);
 
         // Ticker search proxy
     Route::get('/search', function (\Illuminate\Http\Request $request) {
@@ -78,4 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/company/import', [CompanyController::class, 'import']);
         Route::post('/epam/refresh',   [AnalyzeController::class, 'refreshEpam']);
     });
+
+    Route::delete('/alerts/{id}', [AlertController::class, 'destroy']);
+    Route::delete('/alerts',      [AlertController::class, 'destroyRead']);
 });

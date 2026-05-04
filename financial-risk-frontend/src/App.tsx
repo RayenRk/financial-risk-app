@@ -12,6 +12,8 @@ import Analyze from "./pages/Analyze.tsx";
 import CompanyDetail from "./pages/CompanyDetail.tsx";
 import { RefreshProvider } from "./context/RefreshContext.tsx";
 import ToastNotifications from "./components/ToastNotifications.tsx";
+import Profile from "./pages/Profile.tsx";
+import Register from "./pages/Register.tsx";
 
 export default function App() {
   return (
@@ -22,6 +24,7 @@ export default function App() {
             <ToastNotifications />
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               <Route
                 path="/dashboard"
                 element={
@@ -59,6 +62,14 @@ export default function App() {
                 element={
                   <ProtectedRoute adminOnly>
                     <Users />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
                   </ProtectedRoute>
                 }
               />

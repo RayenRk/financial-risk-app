@@ -3,6 +3,7 @@ import { X, AlertTriangle, Info, ShieldAlert } from "lucide-react";
 import api from "../api/axios.ts";
 import { useRefresh } from "../context/RefreshContext.tsx";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.tsx";
 
 interface ToastAlert {
   id: number;
@@ -59,12 +60,14 @@ export default function ToastNotifications() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const shownIds = useRef<Set<number>>(new Set());
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const dismiss = (toastId: string) => {
     setToasts((prev) => prev.filter((t) => t.toastId !== toastId));
   };
 
   const checkForNewAlerts = useCallback(async () => {
+    if (!isAuthenticated()) return;
     try {
       const res = await api.get("/alerts/unread");
       const alerts = (res.data.alerts ?? []) as ToastAlert[];
@@ -87,7 +90,7 @@ export default function ToastNotifications() {
     } catch {
       // silent
     }
-  }, [refresh]);
+  }, [isAuthenticated, refresh]);
 
   // Poll every 60 seconds
   useEffect(() => {

@@ -14,9 +14,11 @@ import {
   ChevronDown,
   ChevronUp,
   Building2,
+  Trash2,
 } from "lucide-react";
 import api from "../api/axios.ts";
 import { useRefresh } from "../context/RefreshContext.tsx";
+import ConfirmDialog from "./ConfirmDialog.tsx";
 
 interface Company {
   id: number;
@@ -42,6 +44,10 @@ export default function Sidebar() {
     { to: "/alerts", icon: Bell, label: "Alerts" },
     { to: "/analyze", icon: Search, label: "Analyze Company" },
   ];
+
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const [confirmDeleteName, setConfirmDeleteName] = useState("");
 
   const fetchCompanies = () => {
     api
@@ -69,6 +75,22 @@ export default function Sidebar() {
   const nonPrimaryCompanies = companies.filter(
     (c) => c.ticker !== primary_ticker,
   );
+
+  const deleteCompany = async () => {
+    if (!confirmDeleteId) return;
+    setConfirmDeleteOpen(false);
+    try {
+      await api.delete(`/companies/${confirmDeleteId}`);
+      setCompanies((prev) => prev.filter((c) => c.id !== confirmDeleteId));
+      if (window.location.pathname.includes("/companies/")) {
+        navigate("/analyze");
+      }
+    } catch (err: any) {
+      console.error("Delete failed:", err.response?.data?.message);
+    } finally {
+      setConfirmDeleteId(null);
+    }
+  };
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-10">
@@ -158,19 +180,34 @@ export default function Sidebar() {
             {showCompanies && (
               <div className="mt-1 space-y-0.5">
                 {nonPrimaryCompanies.map((c) => (
-                  <button
+                  <div
                     key={c.id}
-                    onClick={() => navigate(`/companies/${c.ticker}`)}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors text-left"
+                    className="group flex items-center gap-2.5 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
                   >
-                    {riskDot(c.risk_color)}
-                    <span className="font-mono text-xs text-gray-300 shrink-0">
-                      {c.ticker}
-                    </span>
-                    <span className="text-gray-500 text-xs truncate">
-                      {c.name}
-                    </span>
-                  </button>
+                    <div
+                      className="flex items-center gap-2.5 flex-1 cursor-pointer"
+                      onClick={() => navigate(`/companies/${c.ticker}`)}
+                    >
+                      {riskDot(c.risk_color)}
+                      <span className="font-mono text-xs text-gray-300 shrink-0">
+                        {c.ticker}
+                      </span>
+                      <span className="text-gray-500 text-xs truncate">
+                        {c.name}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setConfirmDeleteId(c.id);
+                        setConfirmDeleteName(c.name);
+                        setConfirmDeleteOpen(true);
+                      }}
+                      className="opacity-0 group-hover:opacity-100 text-gray-600 hover:text-red-400 transition-all shrink-0"
+                      title={`Remove ${c.ticker}`}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -180,7 +217,11 @@ export default function Sidebar() {
 
       {/* User + logout */}
       <div className="px-3 pb-4 border-t border-gray-800 pt-4">
-        <div className="flex items-center gap-3 px-3 py-2 mb-2">
+        <div
+          onClick={() => navigate("/profile")}
+          className="flex items-center gap-3 px-3 py-2 mb-2 cursor-pointer hover:bg-gray-800 rounded-xl transition-colors"
+        >
+          {" "}
           <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
             <span className="text-white text-xs font-bold">
               {user?.name?.charAt(0).toUpperCase()}
@@ -201,6 +242,18 @@ export default function Sidebar() {
           Sign out
         </button>
       </div>
+      <ConfirmDialog
+        open={confirmDeleteOpen}
+        title="Remove Company"
+        message={`Remove ${confirmDeleteName} and all its data from the system? This cannot be undone.`}
+        confirmText="Remove"
+        danger={true}
+        onConfirm={deleteCompany}
+        onCancel={() => {
+          setConfirmDeleteOpen(false);
+          setConfirmDeleteId(null);
+        }}
+      />
     </aside>
   );
 }

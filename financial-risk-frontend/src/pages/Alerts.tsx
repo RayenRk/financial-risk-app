@@ -6,10 +6,12 @@ import {
   Info,
   CheckCircle,
   RefreshCw,
+  Trash2,
 } from "lucide-react";
 import Layout from "../components/Layout.tsx";
 import api from "../api/axios.ts";
 import { useRefresh } from "../context/RefreshContext.tsx";
+import ConfirmDialog from "../components/ConfirmDialog.tsx";
 
 interface Alert {
   id: number;
@@ -74,6 +76,11 @@ export default function Alerts() {
   const [markingAll, setMarkingAll] = useState(false);
   const [refreshed, setRefreshed] = useState(false);
 
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmAlertId, setConfirmAlertId] = useState<number | null>(null);
+  const [deletingAll, setDeletingAll] = useState(false);
+  const [confirmAllOpen, setConfirmAllOpen] = useState(false);
+
   const fetchAlerts = async (silent = false) => {
     if (!silent) setLoading(true);
     try {
@@ -84,6 +91,34 @@ export default function Alerts() {
       setError("Failed to load alerts.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteAlert = async () => {
+    if (!confirmAlertId) return;
+    setConfirmOpen(false);
+    try {
+      await api.delete(`/alerts/${confirmAlertId}`);
+      setAlerts((prev) => prev.filter((a) => a.id !== confirmAlertId));
+      refresh();
+    } catch {
+      /* silent */
+    } finally {
+      setConfirmAlertId(null);
+    }
+  };
+
+  const deleteAllRead = async () => {
+    setConfirmAllOpen(false);
+    setDeletingAll(true);
+    try {
+      await api.delete("/alerts");
+      setAlerts((prev) => prev.filter((a) => !a.is_read));
+      refresh();
+    } catch {
+      /* silent */
+    } finally {
+      setDeletingAll(false);
     }
   };
 
@@ -174,6 +209,16 @@ export default function Alerts() {
               >
                 <CheckCircle className="w-4 h-4" />
                 {markingAll ? "Marking..." : "Mark all read"}
+              </button>
+            )}
+            {alerts.some((a) => a.is_read) && (
+              <button
+                onClick={() => setConfirmAllOpen(true)}
+                disabled={deletingAll}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-xl text-sm transition-colors border border-red-500/30"
+              >
+                <Trash2 className="w-4 h-4" />
+                {deletingAll ? "Deleting..." : "Clear read"}
               </button>
             )}
           </div>
@@ -306,12 +351,43 @@ export default function Alerts() {
                       <Bell className="w-3 h-3" /> Mark read
                     </button>
                   )}
+                  <button
+                    onClick={() => {
+                      setConfirmAlertId(alert.id);
+                      setConfirmOpen(true);
+                    }}
+                    className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-xs transition-colors"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Delete Alert"
+        message="Are you sure you want to delete this alert? This cannot be undone."
+        confirmText="Delete"
+        danger={true}
+        onConfirm={deleteAlert}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setConfirmAlertId(null);
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirmAllOpen}
+        title="Clear Read Alerts"
+        message="This will permanently delete all read alerts. Unread alerts will be kept."
+        confirmText="Clear All Read"
+        danger={true}
+        onConfirm={deleteAllRead}
+        onCancel={() => setConfirmAllOpen(false)}
+      />
     </Layout>
   );
 }

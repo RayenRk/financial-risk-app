@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import api from '../api/axios.ts';
+import { useAuth } from './AuthContext.tsx';
 
 interface CompanySummary {
   current_risk: string;
@@ -27,8 +28,10 @@ export function RefreshProvider({ children }: { children: ReactNode }) {
   const [unreadAlerts,   setUnreadAlerts]   = useState(0);
   const [companySummary, setCompanySummary] = useState<CompanySummary | null>(null);
   const [lastUpdated,    setLastUpdated]    = useState<Date | null>(null);
+  const { isAuthenticated } = useAuth(); // ← add this
 
   const fetchAll = useCallback(async () => {
+    if (!isAuthenticated()) return; // Don't fetch if not logged in
     try {
       const [alertsRes, companyRes] = await Promise.all([
         api.get('/alerts/unread'),
@@ -49,7 +52,7 @@ export function RefreshProvider({ children }: { children: ReactNode }) {
     } catch {
       // silent — don't crash if API is down
     }
-  }, []);
+  }, [isAuthenticated]);
 
   // Initial fetch + poll every 60 seconds
   useEffect(() => {

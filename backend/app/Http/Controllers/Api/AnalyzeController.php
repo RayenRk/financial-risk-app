@@ -79,29 +79,27 @@ class AnalyzeController extends Controller
     public function destroy(int $id)
     {
         $primaryTicker = config('app.primary_ticker', 'EPAM');
-        $company = Company::findOrFail($id);
+        $company       = Company::findOrFail($id);
 
-    // Never allow deleting the primary company
+        // Never allow deleting the primary company
         if ($company->ticker === $primaryTicker) {
             return response()->json([
                 'message' => "Cannot delete the primary company ({$primaryTicker}).",
             ], 403);
         }
 
-    // Delete all related data
-        $company->quarters()->each(function ($quarter) {
-            $quarter->riskPrediction()->delete();
-            $quarter->alerts()->delete();
-            $quarter->delete();
-        });
-        $company->alerts()->delete();
-        $company->watchlist()->delete();
+        // Delete all related data in correct order
+        $quarterIds = $company->quarters()->pluck('id');
+        RiskPrediction::whereIn('quarter_id', $quarterIds)->delete();
+        Alert::where('company_id', $company->id)->delete();
+        Quarter::where('company_id', $company->id)->delete();
+        UserCompanyWatchlist::where('company_id', $company->id)->delete();
         $company->delete();
 
         return response()->json([
-            'message' => "{$company->name} removed successfully.",
+            'message' => "{$company->name} and all related data deleted successfully.",
         ]);
-    }   
+    }  
 
     // GET /api/companies — list all analyzed companies
     public function index()

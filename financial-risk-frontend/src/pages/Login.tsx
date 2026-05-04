@@ -1,29 +1,29 @@
-import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { TrendingUp, Shield, AlertCircle } from 'lucide-react';
+import { useState, type FormEvent } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { TrendingUp, Shield, AlertCircle } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
-  const navigate   = useNavigate();
+  const navigate = useNavigate();
 
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     try {
       await login({ email, password });
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err: any) {
       setError(
         err.response?.data?.message ||
-        err.response?.data?.errors?.email?.[0] ||
-        'Login failed. Please check your credentials.'
+          err.response?.data?.errors?.email?.[0] ||
+          "Login failed. Please check your credentials.",
       );
     } finally {
       setLoading(false);
@@ -38,27 +38,36 @@ export default function Login() {
           <div className="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
-          <span className="text-white font-semibold text-lg tracking-tight">FinXG</span>
+          <span className="text-white font-semibold text-lg tracking-tight">
+            FinXG
+          </span>
         </div>
 
         <div>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
-            Risk Detection<br />
+            Risk Detection
+            <br />
             <span className="text-blue-400">Intelligent Platform</span>
           </h1>
           <p className="text-gray-400 text-lg leading-relaxed mb-10">
-            AI-powered risk detection and financial analysis and alerts for enterprise.
+            AI-powered risk detection and financial analysis and alerts for
+            enterprise.
           </p>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-6">
             {[
-              { label: 'Model Accuracy', value: '91%' },
-              { label: 'AUC Score', value: '0.97' },
-              { label: 'Quarters Analyzed', value: '6' },
+              { label: "Model Accuracy", value: "91%" },
+              { label: "AUC Score", value: "0.97" },
+              { label: "Quarters Analyzed", value: "6" },
             ].map((stat) => (
-              <div key={stat.label} className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
+              <div
+                key={stat.label}
+                className="bg-white/5 rounded-xl p-4 border border-white/10"
+              >
+                <div className="text-2xl font-bold text-white mb-1">
+                  {stat.value}
+                </div>
                 <div className="text-gray-400 text-xs">{stat.label}</div>
               </div>
             ))}
@@ -138,14 +147,26 @@ export default function Login() {
                   Signing in...
                 </>
               ) : (
-                'Sign in'
+                "Sign in"
               )}
             </button>
           </form>
 
+          <p className="text-center text-gray-500 text-sm mt-4">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              Create one
+            </Link>
+          </p>
+
           {/* Demo credentials hint */}
           <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-800">
-            <p className="text-gray-500 text-xs font-medium mb-2 uppercase tracking-wider">Demo credentials</p>
+            <p className="text-gray-500 text-xs font-medium mb-2 uppercase tracking-wider">
+              Demo credentials
+            </p>
             <div className="space-y-1">
               <p className="text-gray-400 text-sm">
                 <span className="text-gray-500">Admin: </span>

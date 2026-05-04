@@ -94,4 +94,23 @@ class AlertController extends Controller
             'quarter_date'   => $a->quarter?->quarter_date,
         ];
     }
+
+        // DELETE /api/alerts/{id}
+    public function destroy(Request $request, int $id)
+    {
+        $alert = Alert::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+        $alert->delete();
+        return response()->json(['message' => 'Alert deleted.']);
+    }
+
+    // DELETE /api/alerts — delete all read alerts for current user
+    public function destroyRead(Request $request)
+    {
+        $count = Alert::where('user_id', $request->user()->id)
+            ->where('is_read', true)
+            ->delete();
+        return response()->json(['message' => "{$count} read alerts deleted."]);
+    }
 }
