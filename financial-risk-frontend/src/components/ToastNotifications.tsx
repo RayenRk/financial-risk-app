@@ -95,7 +95,7 @@ export default function ToastNotifications() {
   // Poll every 60 seconds
   useEffect(() => {
     checkForNewAlerts();
-    const interval = setInterval(checkForNewAlerts, 60000);
+    const interval = setInterval(checkForNewAlerts, 5000);
     return () => clearInterval(interval);
   }, [checkForNewAlerts]);
 

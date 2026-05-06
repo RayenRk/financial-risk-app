@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AnalyzeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\AdviceController;
+
 
 // Public route — no auth needed
 Route::get('/config', function () {
@@ -50,6 +52,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update']);
     
     Route::delete('/companies/{id}', [AnalyzeController::class, 'destroy']);
+
+    Route::post('/advice/{ticker}', [AdviceController::class, 'generate']);
 
         // Ticker search proxy
     Route::get('/search', function (\Illuminate\Http\Request $request) {

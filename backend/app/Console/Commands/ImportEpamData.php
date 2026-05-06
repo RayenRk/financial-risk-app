@@ -278,6 +278,6 @@ class ImportEpamData extends Command
             Quarter::select('quarter_date')
                 ->whereColumn('quarters.id', 'risk_predictions.quarter_id')
                 ->limit(1)
-        )->first()?->risk_label;
+        )->value('risk_label');
     }
 }

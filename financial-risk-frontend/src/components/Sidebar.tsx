@@ -112,7 +112,7 @@ export default function Sidebar() {
         <p className="text-white font-semibold text-sm">
           {primary_display_name}
         </p>
-        <p className="text-gray-400 text-xs">{primary_ticker}</p>
+        <p className="text-gray-400 text-xs">{primary_display_name}</p>
       </div>
 
       {/* Navigation */}

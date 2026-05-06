@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import Layout from "../components/Layout.tsx";
 import api from "../api/axios.ts";
+import AIRecommendations from "../components/AIRecommendations.tsx";
 
 interface RiskDriver {
   feature: string;
@@ -546,6 +547,11 @@ export default function RiskAnalysis() {
             </table>
           </div>
         </div>
+        {/* AI Recommendations */}
+        <AIRecommendations
+          ticker="EPAM"
+          riskLabel={latest?.risk_label ?? "low_risk"}
+        />
       </div>
     </Layout>
   );
