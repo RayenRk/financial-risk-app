@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── 1. Create default users ────────────────────────────
+        // ── Create default users ────────────────────────────
         $admin = User::firstOrCreate(
             ['email' => 'admin@financialrisk.com'],
             [
@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
         echo "   Admin    : admin@financialrisk.com / Admin@1234\n";
         echo "   Analyst  : analyst@financialrisk.com / Analyst@1234\n";
 
-        // ── 2. Load EPAM JSON ──────────────────────────────────
+        // ── Load EPAM JSON ──────────────────────────────────
         $jsonPath = base_path('data/epam_data.json');
         if (!file_exists($jsonPath)) {
             echo "❌ epam_data.json not found at {$jsonPath}\n";
@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
         $meta    = $data['company'];
         $quarters = $data['quarters'];
 
-        // ── 3. Create company ──────────────────────────────────
+        // ── Create company ──────────────────────────────────
         $company = Company::firstOrCreate(
             ['ticker' => $meta['ticker']],
             [
@@ -68,7 +68,7 @@ class DatabaseSeeder extends Seeder
 
         echo "✅ Company created: {$company->name} ({$company->ticker})\n";
 
-        // ── 4. Add company to both users watchlist ─────────────
+        // ── Add company to both users watchlist ─────────────
         foreach ([$admin, $analyst] as $user) {
             UserCompanyWatchlist::firstOrCreate(
                 ['user_id' => $user->id, 'company_id' => $company->id],
@@ -78,7 +78,7 @@ class DatabaseSeeder extends Seeder
 
         echo "✅ Watchlist configured for both users\n";
 
-        // ── 5. Import quarters + predictions ──────────────────
+        // ── Import quarters + predictions ──────────────────
         $previousLabel = null;
         $quartersCreated = 0;
         $predictionsCreated = 0;

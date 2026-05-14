@@ -25,7 +25,7 @@ class ImportEpamData extends Command
         $this->info('Starting EPAM data import...');
         $start = now();
 
-        // ── 1. Call FastAPI ────────────────────────────────────────────────
+        // ── Call FastAPI ────────────────────────────────────────────────
         $this->line('  → Fetching EPAM data from FastAPI...');
         try {
             $response = Http::timeout(60)->post("{$this->fastApiUrl}/analyze", [
@@ -48,7 +48,7 @@ class ImportEpamData extends Command
         $this->line("  → Data quality: {$analysis['data_quality']}% ({$analysis['data_quality_note']})");
         $this->line("  → Quarters: {$analysis['total_quarters']}");
 
-        // ── 2. Upsert company ──────────────────────────────────────────────
+        // ── Upsert company ──────────────────────────────────────────────
         $companyModel = Company::updateOrCreate(
             ['ticker' => config('app.primary_ticker', 'EPAM')],
             [
@@ -66,7 +66,7 @@ class ImportEpamData extends Command
 
         $this->line("  → Company: {$companyModel->name} (ID: {$companyModel->id})");
 
-        // ── 3. Add to watchlists ───────────────────────────────────────────
+        // ── Add to watchlists ───────────────────────────────────────────
         User::all()->each(function ($user) use ($companyModel) {
             UserCompanyWatchlist::firstOrCreate(
                 ['user_id' => $user->id, 'company_id' => $companyModel->id],
@@ -74,7 +74,7 @@ class ImportEpamData extends Command
             );
         });
 
-        // ── 4. Get previous risk before importing ──────────────────────────
+        // ── Get previous risk before importing ──────────────────────────
         $previousLabel    = $this->getPreviousRiskLabel($companyModel->id);
         $newQuarters      = 0;
         $updatedQuarters  = 0;
@@ -86,7 +86,7 @@ class ImportEpamData extends Command
         // Identify latest quarter date to restrict alerts to latest only
         $latestDate = !empty($quarters) ? end($quarters)['date'] : null;
 
-        // ── 5. Import quarters loop ────────────────────────────────────────
+        // ── Import quarters loop ────────────────────────────────────────
         foreach ($quarters as $q) {
 
             $existing = Quarter::where('company_id', $companyModel->id)
@@ -200,9 +200,10 @@ class ImportEpamData extends Command
                 $riskChanged = true;
             }
 
-        } // ← end foreach quarters
+        }
 
-        // ── 6. Send email notification on risk change ──────────────────────
+        // ── Send email notification on risk change ──────────────────────
+
         if ($riskChanged && $latestQuarter && $latestPrediction) {
             $this->line('  → Risk changed — sending notifications...');
 
@@ -250,7 +251,7 @@ class ImportEpamData extends Command
             $this->info("  → Notifications sent to {$watchingUsers->count()} users");
         }
 
-        // ── 7. Summary ─────────────────────────────────────────────────────
+        // ── Summary ─────────────────────────────────────────────────────
         $elapsed = abs(now()->diffInSeconds($start));
         $this->newLine();
         $this->info('✅ EPAM import complete!');

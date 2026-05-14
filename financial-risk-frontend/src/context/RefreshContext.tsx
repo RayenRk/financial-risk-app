@@ -28,7 +28,7 @@ export function RefreshProvider({ children }: { children: ReactNode }) {
   const [unreadAlerts,   setUnreadAlerts]   = useState(0);
   const [companySummary, setCompanySummary] = useState<CompanySummary | null>(null);
   const [lastUpdated,    setLastUpdated]    = useState<Date | null>(null);
-  const { isAuthenticated } = useAuth(); // ← add this
+  const { isAuthenticated } = useAuth();
 
   const fetchAll = useCallback(async () => {
     if (!isAuthenticated()) return; // Don't fetch if not logged in
