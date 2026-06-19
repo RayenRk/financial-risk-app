@@ -160,7 +160,7 @@ export default function CompanyDetail() {
   if (loading)
     return (
       <Layout>
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-950">
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
       </Layout>
@@ -169,18 +169,22 @@ export default function CompanyDetail() {
   if (error)
     return (
       <Layout>
-        <div className="p-8">
+        <div className="p-8 bg-gray-50 dark:bg-gray-950 min-h-screen">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-gray-400 hover:text-white mb-6 transition-colors"
+            className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
-          <div className="flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-xl p-5">
-            <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
+          <div className="flex items-start gap-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-5">
+            <AlertTriangle className="w-5 h-5 text-red-500 dark:text-red-400 shrink-0" />
             <div>
-              <p className="text-red-400 font-medium">Company not found</p>
-              <p className="text-red-400/70 text-sm mt-1">{error}</p>
+              <p className="text-red-600 dark:text-red-400 font-medium">
+                Company not found
+              </p>
+              <p className="text-red-500/70 dark:text-red-400/70 text-sm mt-1">
+                {error}
+              </p>
               <button
                 onClick={() => navigate("/analyze")}
                 className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition-colors"
@@ -232,17 +236,17 @@ export default function CompanyDetail() {
   const probData = [
     {
       name: "Low",
-      value: +(n(latest?.prob_low_risk) * 100).toFixed(1),
+      value: +(n(latest?.prob_low_risk) * 100).toFixed(2),
       color: "#22c55e",
     },
     {
       name: "Medium",
-      value: +(n(latest?.prob_medium_risk) * 100).toFixed(1),
+      value: +(n(latest?.prob_medium_risk) * 100).toFixed(2),
       color: "#f59e0b",
     },
     {
       name: "High",
-      value: +(n(latest?.prob_high_risk) * 100).toFixed(1),
+      value: +(n(latest?.prob_high_risk) * 100).toFixed(2),
       color: "#ef4444",
     },
   ];
@@ -266,23 +270,25 @@ export default function CompanyDetail() {
 
   return (
     <Layout>
-      <div className="p-8 space-y-6">
+      <div className="p-8 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-gray-400 hover:text-white mb-3 transition-colors text-sm"
+              className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-3 transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-white">{company.name}</h1>
-              <span className="font-mono text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {company.name}
+              </h1>
+              <span className="font-mono text-xs bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded">
                 {company.ticker}
               </span>
             </div>
-            <p className="text-gray-400 mt-1 text-sm">
+            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
               {company.sector} · {company.industry} · {company.country} ·{" "}
               {company.employees?.toLocaleString()} employees
             </p>
@@ -302,7 +308,7 @@ export default function CompanyDetail() {
               <div>
                 <p className="font-bold text-sm">{ri.text}</p>
                 <p className="text-xs opacity-70">
-                  {(n(latest?.confidence) * 100).toFixed(1)}% confidence
+                  {(n(latest?.confidence) * 100).toFixed(2)}% confidence
                 </p>
               </div>
             </div>
@@ -311,7 +317,7 @@ export default function CompanyDetail() {
             <button
               onClick={refresh}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 rounded-xl text-sm transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 disabled:opacity-50 text-gray-600 dark:text-gray-300 rounded-xl text-sm transition-colors"
             >
               <RefreshCw
                 className={`w-4 h-4 ${refreshing ? "animate-spin" : ""}`}
@@ -322,7 +328,7 @@ export default function CompanyDetail() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-gray-800 pb-0">
+        <div className="flex gap-2 border-b border-gray-200 dark:border-gray-800 pb-0">
           {(
             [
               { key: "overview", label: "Overview" },
@@ -335,8 +341,8 @@ export default function CompanyDetail() {
               onClick={() => setActiveTab(tab.key)}
               className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.key
-                  ? "border-blue-500 text-blue-400"
-                  : "border-transparent text-gray-400 hover:text-white"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
               {tab.label}
@@ -375,7 +381,7 @@ export default function CompanyDetail() {
                 },
                 {
                   label: "Market Cap",
-                  value: `$${((company.market_cap ?? 0) / 1e9).toFixed(1)}B`,
+                  value: `$${((company.market_cap ?? 0) / 1e9).toFixed(2)}B`,
                   sub: `${company.employees?.toLocaleString()} employees`,
                   icon: Building2,
                   up: null,
@@ -383,15 +389,17 @@ export default function CompanyDetail() {
               ].map((kpi) => (
                 <div
                   key={kpi.label}
-                  className="bg-gray-900 border border-gray-800 rounded-xl p-5"
+                  className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-5"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-gray-400 text-sm">{kpi.label}</p>
-                    <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center">
-                      <kpi.icon className="w-4 h-4 text-gray-400" />
+                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                      {kpi.label}
+                    </p>
+                    <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
+                      <kpi.icon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     </div>
                   </div>
-                  <p className="text-2xl font-bold text-white mb-1">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
                     {kpi.value}
                   </p>
                   <div className="flex items-center gap-1">
@@ -401,7 +409,9 @@ export default function CompanyDetail() {
                       ) : (
                         <TrendingDown className="w-3 h-3 text-red-400" />
                       ))}
-                    <p className="text-gray-500 text-xs">{kpi.sub}</p>
+                    <p className="text-gray-400 dark:text-gray-500 text-xs">
+                      {kpi.sub}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -409,11 +419,13 @@ export default function CompanyDetail() {
 
             {/* Revenue + risk history */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                   Revenue & Net Income
                 </h3>
-                <p className="text-gray-500 text-xs mb-4">Quarterly — $M</p>
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
+                  Quarterly — $M
+                </p>
                 <ResponsiveContainer width="100%" height={200}>
                   <AreaChart data={incomeData}>
                     <defs>
@@ -472,23 +484,27 @@ export default function CompanyDetail() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">Risk History</h3>
-                <p className="text-gray-500 text-xs mb-4">All quarters</p>
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
+                  Risk History
+                </h3>
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
+                  All quarters
+                </p>
                 <div className="space-y-2">
                   {[...quarters].reverse().map((q, i) => {
                     const qri = riskInfo(q.risk_label);
                     return (
                       <div
                         key={i}
-                        className="flex items-center justify-between py-2 border-b border-gray-800 last:border-0"
+                        className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-800 last:border-0"
                       >
                         <div className="flex items-center gap-3">
                           <div
                             className="w-2 h-2 rounded-full"
                             style={{ background: qri.color }}
                           />
-                          <span className="text-gray-300 text-sm font-mono">
+                          <span className="text-gray-700 dark:text-gray-300 text-sm font-mono">
                             {fmt(q.quarter_date)}
                           </span>
                         </div>
@@ -499,8 +515,8 @@ export default function CompanyDetail() {
                           >
                             {qri.text}
                           </span>
-                          <span className="text-gray-500 text-xs">
-                            {(n(q.confidence) * 100).toFixed(1)}%
+                          <span className="text-gray-400 dark:text-gray-500 text-xs">
+                            {(n(q.confidence) * 100).toFixed(2)}%
                           </span>
                         </div>
                       </div>
@@ -512,12 +528,12 @@ export default function CompanyDetail() {
 
             {/* Company description */}
             {company.description && (
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                  <Database className="w-4 h-4 text-gray-400" /> About{" "}
-                  {company.name}
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-3 flex items-center gap-2">
+                  <Database className="w-4 h-4 text-gray-500 dark:text-gray-400" />{" "}
+                  About {company.name}
                 </h3>
-                <p className="text-gray-400 text-sm leading-relaxed">
+                <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                   {company.description}
                 </p>
                 {company.website && (
@@ -555,20 +571,24 @@ export default function CompanyDetail() {
               ].map((card) => (
                 <div
                   key={card.label}
-                  className="bg-gray-900 border border-gray-800 rounded-xl p-4"
+                  className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4"
                 >
-                  <p className="text-gray-400 text-xs mb-2">{card.label}</p>
-                  <p className="text-xl font-bold text-white">{card.value}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">
+                    {card.label}
+                  </p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">
+                    {card.value}
+                  </p>
                 </div>
               ))}
             </div>
 
             {/* Charts */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-              <h3 className="text-white font-semibold mb-1">
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+              <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                 Income Statement
               </h3>
-              <p className="text-gray-500 text-xs mb-4">
+              <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
                 Revenue, operating income, net income — $M
               </p>
               <ResponsiveContainer width="100%" height={240}>
@@ -635,11 +655,11 @@ export default function CompanyDetail() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                   Profit Margins
                 </h3>
-                <p className="text-gray-500 text-xs mb-4">
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
                   Quarterly — percentage
                 </p>
                 <ResponsiveContainer width="100%" height={200}>
@@ -682,11 +702,13 @@ export default function CompanyDetail() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                   Cash Flow & Debt
                 </h3>
-                <p className="text-gray-500 text-xs mb-4">Quarterly — $M</p>
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
+                  Quarterly — $M
+                </p>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={cashData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
@@ -723,14 +745,16 @@ export default function CompanyDetail() {
             </div>
 
             {/* Data table */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-800">
-                <h3 className="text-white font-semibold">Quarterly Data</h3>
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+                <h3 className="text-gray-900 dark:text-white font-semibold">
+                  Quarterly Data
+                </h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-800">
+                    <tr className="border-b border-gray-200 dark:border-gray-800">
                       {[
                         "Quarter",
                         "Revenue",
@@ -743,7 +767,7 @@ export default function CompanyDetail() {
                       ].map((h) => (
                         <th
                           key={h}
-                          className="text-left px-4 py-3 text-gray-400 font-medium text-xs"
+                          className="text-left px-4 py-3 text-gray-500 dark:text-gray-400 font-medium text-xs"
                         >
                           {h}
                         </th>
@@ -756,12 +780,12 @@ export default function CompanyDetail() {
                       return (
                         <tr
                           key={q.id}
-                          className={`border-b border-gray-800/50 ${i % 2 === 0 ? "bg-gray-800/20" : ""}`}
+                          className={`border-b border-gray-100 dark:border-gray-800/50 ${i % 2 === 0 ? "bg-gray-50 dark:bg-gray-800/20" : ""}`}
                         >
-                          <td className="px-4 py-3 text-gray-300 font-mono text-xs">
+                          <td className="px-4 py-3 text-gray-600 dark:text-gray-300 font-mono text-xs">
                             {fmt(q.quarter_date)}
                           </td>
-                          <td className="px-4 py-3 text-white">
+                          <td className="px-4 py-3 text-gray-900 dark:text-white">
                             {usd(q.revenue)}
                           </td>
                           <td className="px-4 py-3 text-yellow-400">
@@ -823,10 +847,12 @@ export default function CompanyDetail() {
             >
               <Shield className="w-10 h-10" style={{ color: ri.color }} />
               <div className="flex-1">
-                <p className="text-white font-bold text-xl">{ri.text}</p>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-900 dark:text-white font-bold text-xl">
+                  {ri.text}
+                </p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
                   Latest: {fmt(latest?.quarter_date ?? "")} ·{" "}
-                  {(n(latest?.confidence) * 100).toFixed(1)}% confidence
+                  {(n(latest?.confidence) * 100).toFixed(2)}% confidence
                 </p>
               </div>
               <div className="flex gap-6 text-right">
@@ -848,9 +874,11 @@ export default function CompanyDetail() {
                   },
                 ].map((p) => (
                   <div key={p.label}>
-                    <p className="text-gray-400 text-xs">{p.label}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs">
+                      {p.label}
+                    </p>
                     <p className="font-bold" style={{ color: p.color }}>
-                      {(p.value * 100).toFixed(1)}%
+                      {(p.value * 100).toFixed(2)}%
                     </p>
                   </div>
                 ))}
@@ -859,11 +887,13 @@ export default function CompanyDetail() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Probability bars */}
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                   Risk Probabilities
                 </h3>
-                <p className="text-gray-500 text-xs mb-4">Latest quarter</p>
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
+                  Latest quarter
+                </p>
                 <ResponsiveContainer width="100%" height={160}>
                   <BarChart data={probData} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
@@ -893,11 +923,13 @@ export default function CompanyDetail() {
               </div>
 
               {/* Radar */}
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                   Financial Health Radar
                 </h3>
-                <p className="text-gray-500 text-xs mb-4">Normalised 0–100</p>
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
+                  Normalised 0–100
+                </p>
                 <ResponsiveContainer width="100%" height={200}>
                   <RadarChart data={radarData}>
                     <PolarGrid stroke="#1f2937" />
@@ -918,25 +950,25 @@ export default function CompanyDetail() {
             </div>
 
             {/* SHAP drivers */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-              <h3 className="text-white font-semibold mb-1">
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+              <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                 Top Risk Drivers
               </h3>
-              <p className="text-gray-500 text-xs mb-5">
+              <p className="text-gray-400 dark:text-gray-500 text-xs mb-5">
                 Latest quarter — SHAP importance
               </p>
               <div className="space-y-4">
                 {(latest?.top_risk_drivers ?? []).map((d, i) => (
                   <div key={i}>
                     <div className="flex justify-between text-sm mb-1.5">
-                      <span className="text-gray-300 capitalize">
+                      <span className="text-gray-700 dark:text-gray-300 capitalize">
                         {d.feature.replace(/_/g, " ")}
                       </span>
-                      <span className="text-gray-400 font-mono">
+                      <span className="text-gray-500 dark:text-gray-400 font-mono">
                         {d.importance.toFixed(4)}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-800 rounded-full h-2">
+                    <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
                       <div
                         className="h-2 rounded-full"
                         style={{
@@ -956,14 +988,16 @@ export default function CompanyDetail() {
             </div>
 
             {/* Risk history table */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-800">
-                <h3 className="text-white font-semibold">Risk History</h3>
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+                <h3 className="text-gray-900 dark:text-white font-semibold">
+                  Risk History
+                </h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-gray-800">
+                    <tr className="border-b border-gray-200 dark:border-gray-800">
                       {[
                         "Quarter",
                         "Risk Label",
@@ -975,7 +1009,7 @@ export default function CompanyDetail() {
                       ].map((h) => (
                         <th
                           key={h}
-                          className="text-left px-4 py-3 text-gray-400 font-medium text-xs"
+                          className="text-left px-4 py-3 text-gray-500 dark:text-gray-400 font-medium text-xs"
                         >
                           {h}
                         </th>
@@ -988,9 +1022,9 @@ export default function CompanyDetail() {
                       return (
                         <tr
                           key={q.id}
-                          className={`border-b border-gray-800/50 ${i % 2 === 0 ? "bg-gray-800/20" : ""}`}
+                          className={`border-b border-gray-100 dark:border-gray-800/50 ${i % 2 === 0 ? "bg-gray-50 dark:bg-gray-800/20" : ""}`}
                         >
-                          <td className="px-4 py-3 text-gray-300 font-mono text-xs">
+                          <td className="px-4 py-3 text-gray-600 dark:text-gray-300 font-mono text-xs">
                             {fmt(q.quarter_date)}
                           </td>
                           <td className="px-4 py-3">
@@ -1001,8 +1035,8 @@ export default function CompanyDetail() {
                               {qri.text}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-white">
-                            {(n(q.confidence) * 100).toFixed(1)}%
+                          <td className="px-4 py-3 text-gray-900 dark:text-white">
+                            {(n(q.confidence) * 100).toFixed(2)}%
                           </td>
                           <td className="px-4 py-3">
                             <span
@@ -1034,7 +1068,7 @@ export default function CompanyDetail() {
                                   : "text-red-400"
                               }
                             >
-                              {(n(q.operating_margin) * 100).toFixed(1)}%
+                              {(n(q.operating_margin) * 100).toFixed(2)}%
                             </span>
                           </td>
                           <td className="px-4 py-3">

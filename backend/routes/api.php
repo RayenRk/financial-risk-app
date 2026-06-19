@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\AnalyzeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\AdviceController;
+use App\Http\Controllers\Api\RiskReportController;
 
 
 // Public route — no auth needed
@@ -25,6 +26,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login',    [AuthController::class, 'login']);
 });
+
+Route::get('/report/{ticker}', [RiskReportController::class, 'download']);
 
 // Authenticated
 Route::middleware('auth:sanctum')->group(function () {
@@ -54,6 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/companies/{id}', [AnalyzeController::class, 'destroy']);
 
     Route::post('/advice/{ticker}', [AdviceController::class, 'generate']);
+    Route::post('/advice/{ticker}/analyst', [AdviceController::class, 'analyst']);
+
 
         // Ticker search proxy
     Route::get('/search', function (\Illuminate\Http\Request $request) {

@@ -1,0 +1,66 @@
+{
+  "company": {
+    "ticker": "EPAM",
+    "name": "EPAM Systems, Inc.",
+    "sector": "Technology",
+    "industry": "Information Technology Services",
+    "country": "United States",
+    "employees": 62850,
+    "market_cap": 6277009920,
+    "website": "https://www.epam.com",
+    "description": "EPAM Systems, Inc. provides digital platform engineering and software development services worldwide. The company offers engineering services, including requirements analysis and platform selection, customization, cross-platform migration, implementation, and integration; cloud services for creating",
+    "fetched_at": "2026-04-26T00:52:08.432367",
+    "model_f1": 0.9113,
+    "model_auc": 0.9716
+  },
+  "latest": {
+    "date": "2025-12-31",
+    "ticker": "EPAM",
+    "revenue": 1407.55,
+    "gross_profit": 423.2,
+    "operating_income": 149.25,
+    "net_income": 109.35,
+    "free_cash_flow": 268.11,
+    "total_debt": 143.7,
+    "cash": 1296.08,
+    "gross_margin": 0.3007,
+    "operating_margin": 0.106,
+    "net_margin": 0.0777,
+    "current_ratio": 2.5937,
+    "debt_to_equity": 0.0391,
+    "roe": 0.0297,
+    "roa": 0.0223,
+    "interest_coverage": 100.0,
+    "revenue_growth_yoy": 0.1275,
+    "risk_label": "low_risk",
+    "risk_score": 0.9969000220298767,
+    "prob_high_risk": 0.00039999998989515007,
+    "prob_low_risk": 0.9969000220298767,
+    "prob_medium_risk": 0.0027000000700354576,
+    "top_risk_drivers": [
+      {
+        "feature": "current_ratio",
+        "importance": 1.2468
+      },
+      {
+        "feature": "interest_coverage",
+        "importance": 0.7353
+      },
+      {
+        "feature": "debt_to_equity",
+        "importance": 0.6376
+      }
+    ]
+  },
+  "summary": {
+    "total_quarters": 6,
+    "date_range": "2024-09-30 \u2192 2025-12-31",
+    "latest_risk": "low_risk",
+    "latest_confidence": 0.9969000220298767,
+    "risk_distribution": {
+      "low_risk": 6,
+      "medium_risk": 0,
+      "high_risk": 0
+    }
+  }
+}

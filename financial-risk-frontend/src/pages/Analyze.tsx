@@ -169,18 +169,18 @@ export default function Analyze() {
 
   return (
     <Layout>
-      <div className="p-8 space-y-6">
+      <div className="p-8 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-white">Analyze Company</h1>
-          <p className="text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analyze Company</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
             Enter any publicly listed ticker to run a full financial risk
             analysis
           </p>
         </div>
 
         {/* Search bar */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
           <div className="flex gap-3">
             <TickerAutocomplete
               value={ticker}
@@ -211,7 +211,7 @@ export default function Analyze() {
 
           {/* Quick tickers */}
           <div className="mt-4">
-            <p className="text-gray-500 text-xs mb-2 uppercase tracking-wider">
+            <p className="text-gray-400 dark:text-gray-500 text-xs mb-2 uppercase tracking-wider">
               Quick search
             </p>
             <div className="flex gap-2 flex-wrap">
@@ -220,10 +220,10 @@ export default function Analyze() {
                   key={q.ticker}
                   onClick={() => analyze(q.ticker)}
                   disabled={loading}
-                  className="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 hover:text-white rounded-lg text-xs font-mono transition-colors"
+                  className="px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 disabled:opacity-50 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white rounded-lg text-xs font-mono transition-colors"
                 >
                   {q.ticker}
-                  <span className="text-gray-500 ml-1 font-sans">
+                  <span className="text-gray-400 dark:text-gray-500 ml-1 font-sans">
                     {q.label}
                   </span>
                 </button>
@@ -237,8 +237,8 @@ export default function Analyze() {
           <div className="flex flex-col items-center justify-center py-16 gap-4">
             <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
             <div className="text-center">
-              <p className="text-white font-medium">Analyzing {ticker}...</p>
-              <p className="text-gray-400 text-sm mt-1">
+              <p className="text-gray-900 dark:text-white font-medium">Analyzing {ticker}...</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                 Fetching financials → engineering features → scoring risk
               </p>
             </div>
@@ -260,18 +260,18 @@ export default function Analyze() {
         {result && !loading && (
           <div className="space-y-6">
             {/* Company header */}
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+            <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    <h2 className="text-xl font-bold text-white">
+                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                       {result.company.name}
                     </h2>
-                    <span className="text-xs font-mono bg-gray-800 text-gray-400 px-2 py-0.5 rounded">
+                    <span className="text-xs font-mono bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded">
                       {result.ticker}
                     </span>
                   </div>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">
                     {result.company.sector} · {result.company.country} ·{" "}
                     {result.company.employees?.toLocaleString()} employees · $
                     {((result.company.market_cap ?? 0) / 1e9).toFixed(1)}B
@@ -295,7 +295,7 @@ export default function Analyze() {
                       {riskInfo(result.analysis.latest_risk).text}
                     </p>
                     <p className="text-xs opacity-70">
-                      {(result.analysis.latest_confidence * 100).toFixed(1)}%
+                      {(result.analysis.latest_confidence * 100).toFixed(2)}%
                       confidence
                     </p>
                   </div>
@@ -303,10 +303,10 @@ export default function Analyze() {
               </div>
 
               {/* Data quality + meta */}
-              <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-800">
+              <div className="flex items-center gap-6 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-2">
                   <Database className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-400 text-sm">
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">
                     Data quality:
                     <span
                       className={`ml-1 font-medium ${
@@ -324,14 +324,14 @@ export default function Analyze() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-gray-500" />
-                  <span className="text-gray-400 text-sm">
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">
                     {result.analysis.total_quarters} quarters ·{" "}
                     {result.analysis.date_range}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-gray-400 text-sm">
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">
                     Saved to database
                   </span>
                 </div>
@@ -368,10 +368,10 @@ export default function Analyze() {
               ].map((card) => (
                 <div
                   key={card.label}
-                  className="bg-gray-900 border border-gray-800 rounded-xl p-4"
+                  className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-4"
                 >
-                  <p className="text-gray-400 text-xs mb-2">{card.label}</p>
-                  <p className="text-xl font-bold text-white">{card.value}</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-2">{card.label}</p>
+                  <p className="text-xl font-bold text-gray-900 dark:text-white">{card.value}</p>
                 </div>
               ))}
             </div>
@@ -379,9 +379,9 @@ export default function Analyze() {
             {/* Charts row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Revenue trend */}
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">Revenue Trend</h3>
-                <p className="text-gray-500 text-xs mb-4">Quarterly — $M</p>
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">Revenue Trend</h3>
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">Quarterly — $M</p>
                 <ResponsiveContainer width="100%" height={200}>
                   <AreaChart data={revenueData}>
                     <defs>
@@ -398,12 +398,12 @@ export default function Analyze() {
                         />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-grid, #1f2937)" />
                     <XAxis
                       dataKey="date"
-                      tick={{ fill: "#6b7280", fontSize: 11 }}
+                      tick={{ fill: "var(--color-tick, #6b7280)", fontSize: 11 }}
                     />
-                    <YAxis tick={{ fill: "#6b7280", fontSize: 11 }} />
+                    <YAxis tick={{ fill: "var(--color-tick, #6b7280)", fontSize: 11 }} />
                     <Tooltip
                       {...TOOLTIP_STYLE}
                       formatter={(v: number) => [`$${v}M`]}
@@ -421,22 +421,22 @@ export default function Analyze() {
               </div>
 
               {/* Risk distribution */}
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                   Risk Distribution
                 </h3>
-                <p className="text-gray-500 text-xs mb-4">
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
                   Quarters by risk level
                 </p>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={riskData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-grid, #1f2937)" />
                     <XAxis
                       dataKey="name"
-                      tick={{ fill: "#6b7280", fontSize: 11 }}
+                      tick={{ fill: "var(--color-tick, #6b7280)", fontSize: 11 }}
                     />
                     <YAxis
-                      tick={{ fill: "#6b7280", fontSize: 11 }}
+                      tick={{ fill: "var(--color-tick, #6b7280)", fontSize: 11 }}
                       allowDecimals={false}
                     />
                     <Tooltip
@@ -456,9 +456,9 @@ export default function Analyze() {
             {/* Risk history + top drivers */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Risk history */}
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">Risk History</h3>
-                <p className="text-gray-500 text-xs mb-4">All quarters</p>
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">Risk History</h3>
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">All quarters</p>
                 <div className="space-y-2">
                   {[...result.quarters].reverse().map((q, i) => {
                     const ri = riskInfo(q.risk_label);
@@ -472,7 +472,7 @@ export default function Analyze() {
                             className="w-2 h-2 rounded-full"
                             style={{ background: ri.color }}
                           />
-                          <span className="text-gray-300 text-sm font-mono">
+                          <span className="text-gray-700 dark:text-gray-300 text-sm font-mono">
                             {q.date}
                           </span>
                         </div>
@@ -484,7 +484,7 @@ export default function Analyze() {
                             {ri.text}
                           </span>
                           <span className="text-gray-500 text-xs">
-                            {(n(q.confidence) * 100).toFixed(1)}%
+                            {(n(q.confidence) * 100).toFixed(2)}%
                           </span>
                         </div>
                       </div>
@@ -494,25 +494,25 @@ export default function Analyze() {
               </div>
 
               {/* Top risk drivers */}
-              <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-                <h3 className="text-white font-semibold mb-1">
+              <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
+                <h3 className="text-gray-900 dark:text-white font-semibold mb-1">
                   Top Risk Drivers
                 </h3>
-                <p className="text-gray-500 text-xs mb-4">
+                <p className="text-gray-400 dark:text-gray-500 text-xs mb-4">
                   Latest quarter — SHAP importance
                 </p>
                 <div className="space-y-4">
                   {(latest?.top_risk_drivers ?? []).map((d, i) => (
                     <div key={i}>
                       <div className="flex justify-between text-sm mb-1.5">
-                        <span className="text-gray-300 capitalize">
+                        <span className="text-gray-700 dark:text-gray-300 capitalize">
                           {d.feature.replace(/_/g, " ")}
                         </span>
-                        <span className="text-gray-400 font-mono">
+                        <span className="text-gray-500 dark:text-gray-400 font-mono">
                           {d.importance.toFixed(4)}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-2">
+                      <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2">
                         <div
                           className="h-2 rounded-full"
                           style={{
@@ -531,8 +531,8 @@ export default function Analyze() {
                 </div>
 
                 {/* Probability breakdown */}
-                <div className="mt-6 pt-4 border-t border-gray-800">
-                  <p className="text-gray-400 text-xs mb-3">
+                <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800">
+                  <p className="text-gray-500 dark:text-gray-400 text-xs mb-3">
                     Risk probabilities
                   </p>
                   <div className="grid grid-cols-3 gap-2">
@@ -554,7 +554,7 @@ export default function Analyze() {
                       },
                     ].map((p) => (
                       <div key={p.label} className="text-center">
-                        <p className="text-xs text-gray-500 mb-1">{p.label}</p>
+                        <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">{p.label}</p>
                         <p
                           className="font-bold text-sm"
                           style={{ color: p.color }}

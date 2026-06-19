@@ -118,7 +118,7 @@ export default function TickerAutocomplete({
     <div ref={wrapperRef} className="flex-1 relative">
       {/* Search icon — only show when not searching */}
       {!searching && (
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 z-10" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500 z-10" />
       )}
 
       {/* Spinner — only show when fetching suggestions */}
@@ -141,14 +141,14 @@ export default function TickerAutocomplete({
           setShowSuggestions(true)
         }
         placeholder="Search any company or ticker (e.g. Beyond Meat, SAP, INFY)"
-        className="w-full bg-gray-800 border border-gray-700 rounded-xl pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
+        className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors text-sm"
         autoComplete="off"
         disabled={loading}
       />
 
       {/* Suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && !loading && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden">
           {suggestions.map((s, i) => (
             <button
               key={`${s.ticker}-${i}`}
@@ -158,20 +158,20 @@ export default function TickerAutocomplete({
                 i === activeIndex ? "bg-blue-600/20" : "hover:bg-gray-700/50"
               }`}
             >
-              <span className="font-mono font-bold text-white text-sm w-16 shrink-0">
+              <span className="font-mono font-bold text-gray-900 dark:text-white text-sm w-16 shrink-0">
                 {s.ticker}
               </span>
-              <span className="text-gray-300 text-sm truncate flex-1">
+              <span className="text-gray-600 dark:text-gray-300 text-sm truncate flex-1">
                 {s.name}
               </span>
               <div className="flex items-center gap-2 shrink-0">
                 {s.sector && (
-                  <span className="text-gray-500 text-xs hidden sm:block">
+                  <span className="text-gray-400 dark:text-gray-500 text-xs hidden sm:block">
                     {s.sector}
                   </span>
                 )}
                 {s.exchange && (
-                  <span className="text-xs bg-gray-700 text-gray-400 px-1.5 py-0.5 rounded">
+                  <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 px-1.5 py-0.5 rounded">
                     {s.exchange}
                   </span>
                 )}

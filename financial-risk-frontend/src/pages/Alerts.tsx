@@ -28,17 +28,17 @@ interface Alert {
 
 const severityIcon = (s: string) => {
   if (s === "critical")
-    return <AlertTriangle className="w-4 h-4 text-red-400" />;
+    return <AlertTriangle className="w-4 h-4 text-red-500 dark:text-red-400" />;
   if (s === "warning")
-    return <AlertTriangle className="w-4 h-4 text-yellow-400" />;
-  return <Info className="w-4 h-4 text-blue-400" />;
+    return <AlertTriangle className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />;
+  return <Info className="w-4 h-4 text-blue-500 dark:text-blue-400" />;
 };
 
 const severityBadge = (s: string) => {
-  if (s === "critical") return "bg-red-500/15 text-red-400 border-red-500/30";
+  if (s === "critical") return "bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30";
   if (s === "warning")
-    return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
-  return "bg-blue-500/15 text-blue-400 border-blue-500/30";
+    return "bg-yellow-50 dark:bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-500/30";
+  return "bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30";
 };
 
 const typeLabel = (type: string) =>
@@ -137,7 +137,7 @@ export default function Alerts() {
       setAlerts((prev) =>
         prev.map((a) => (a.id === id ? { ...a, is_read: true } : a)),
       );
-      refresh(); // ← update sidebar badge
+      refresh();
     } catch {
       /* silent */
     }
@@ -168,7 +168,7 @@ export default function Alerts() {
   if (loading)
     return (
       <Layout>
-        <div className="flex items-center justify-center h-screen">
+        <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-950">
           <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
         </div>
       </Layout>
@@ -176,12 +176,12 @@ export default function Alerts() {
 
   return (
     <Layout>
-      <div className="p-8 space-y-6">
+      <div className="p-8 space-y-6 bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Alerts</h1>
-            <p className="text-gray-400 mt-1">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Alerts</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
               {alerts.length} total · {unreadCount} unread · {criticalCount}{" "}
               critical
             </p>
@@ -194,7 +194,7 @@ export default function Alerts() {
                 setRefreshed(false);
               }}
               disabled={refreshed}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 rounded-xl text-sm transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 disabled:opacity-50 text-gray-600 dark:text-gray-300 rounded-xl text-sm transition-colors"
             >
               <RefreshCw
                 className={`w-4 h-4 ${refreshed ? "animate-spin" : ""}`}
@@ -215,7 +215,7 @@ export default function Alerts() {
               <button
                 onClick={() => setConfirmAllOpen(true)}
                 disabled={deletingAll}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-xl text-sm transition-colors border border-red-500/30"
+                className="flex items-center gap-2 px-4 py-2 bg-red-50 dark:bg-red-600/20 hover:bg-red-100 dark:hover:bg-red-600/30 text-red-600 dark:text-red-400 rounded-xl text-sm transition-colors border border-red-200 dark:border-red-500/30"
               >
                 <Trash2 className="w-4 h-4" />
                 {deletingAll ? "Deleting..." : "Clear read"}
@@ -230,33 +230,33 @@ export default function Alerts() {
             {
               label: "Total Alerts",
               value: alerts.length,
-              color: "text-white",
-              bg: "bg-gray-800",
+              color: "text-gray-900 dark:text-white",
+              bg: "bg-white dark:bg-gray-800",
             },
             {
               label: "Unread",
               value: unreadCount,
-              color: "text-blue-400",
+              color: "text-blue-600 dark:text-blue-400",
               bg: "bg-blue-500/10",
             },
             {
               label: "Critical",
               value: criticalCount,
-              color: "text-red-400",
+              color: "text-red-600 dark:text-red-400",
               bg: "bg-red-500/10",
             },
             {
               label: "Warnings",
               value: warningCount,
-              color: "text-yellow-400",
+              color: "text-yellow-600 dark:text-yellow-400",
               bg: "bg-yellow-500/10",
             },
           ].map((c) => (
             <div
               key={c.label}
-              className={`${c.bg} border border-gray-800 rounded-xl p-4`}
+              className={`${c.bg} border border-gray-200 dark:border-gray-800 rounded-xl p-4`}
             >
-              <p className="text-gray-400 text-xs mb-1">{c.label}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-xs mb-1">{c.label}</p>
               <p className={`text-2xl font-bold ${c.color}`}>{c.value}</p>
             </div>
           ))}
@@ -277,7 +277,7 @@ export default function Alerts() {
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
                 filter === tab.key
                   ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700"
+                  : "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700"
               }`}
             >
               {tab.label}
@@ -285,15 +285,15 @@ export default function Alerts() {
           ))}
         </div>
 
-        {error && <p className="text-red-400 text-sm">{error}</p>}
+        {error && <p className="text-red-500 dark:text-red-400 text-sm">{error}</p>}
 
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4">
-              <BellOff className="w-8 h-8 text-gray-600" />
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+              <BellOff className="w-8 h-8 text-gray-300 dark:text-gray-600" />
             </div>
-            <p className="text-gray-400 font-medium">No alerts found</p>
-            <p className="text-gray-600 text-sm mt-1">
+            <p className="text-gray-600 dark:text-gray-400 font-medium">No alerts found</p>
+            <p className="text-gray-400 dark:text-gray-600 text-sm mt-1">
               {filter === "all"
                 ? "No alerts have been generated yet."
                 : `No ${filter} alerts at this time.`}
@@ -304,7 +304,7 @@ export default function Alerts() {
             {filtered.map((alert) => (
               <div
                 key={alert.id}
-                className={`bg-gray-900 border rounded-xl p-5 transition-all ${alert.is_read ? "border-gray-800 opacity-70" : "border-gray-700"}`}
+                className={`bg-white dark:bg-gray-900 border rounded-xl p-5 transition-all ${alert.is_read ? "border-gray-200 dark:border-gray-800 opacity-70" : "border-gray-300 dark:border-gray-700"}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1">
@@ -316,17 +316,17 @@ export default function Alerts() {
                         >
                           {alert.severity.toUpperCase()}
                         </span>
-                        <span className="text-gray-400 text-xs">
+                        <span className="text-gray-500 dark:text-gray-400 text-xs">
                           {typeLabel(alert.type)}
                         </span>
                         {!alert.is_read && (
                           <span className="w-2 h-2 bg-blue-500 rounded-full" />
                         )}
                       </div>
-                      <p className="text-white text-sm leading-relaxed">
+                      <p className="text-gray-800 dark:text-white text-sm leading-relaxed">
                         {alert.message}
                       </p>
-                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                      <div className="flex items-center gap-3 mt-2 text-xs text-gray-400 dark:text-gray-500">
                         <span>{alert.company?.ticker ?? "EPAM"}</span>
                         <span>·</span>
                         <span>{alert.quarter_date?.split("T")[0]}</span>
@@ -335,7 +335,7 @@ export default function Alerts() {
                         {alert.is_read && alert.read_at && (
                           <>
                             <span>·</span>
-                            <span className="text-green-600">
+                            <span className="text-green-600 dark:text-green-500">
                               Read {formatDate(alert.read_at)}
                             </span>
                           </>
@@ -346,7 +346,7 @@ export default function Alerts() {
                   {!alert.is_read && (
                     <button
                       onClick={() => markRead(alert.id)}
-                      className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-lg text-xs transition-colors"
+                      className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg text-xs transition-colors"
                     >
                       <Bell className="w-3 h-3" /> Mark read
                     </button>

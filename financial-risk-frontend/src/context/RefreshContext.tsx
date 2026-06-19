@@ -22,7 +22,7 @@ const RefreshContext = createContext<RefreshContextType>({
   refresh:        () => {},
 });
 
-const POLL_INTERVAL = 60000; // 60 seconds
+const POLL_INTERVAL = 60_000;
 
 export function RefreshProvider({ children }: { children: ReactNode }) {
   const [unreadAlerts,   setUnreadAlerts]   = useState(0);
@@ -31,30 +31,27 @@ export function RefreshProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useAuth();
 
   const fetchAll = useCallback(async () => {
-    if (!isAuthenticated()) return; // Don't fetch if not logged in
+    if (!isAuthenticated()) return;
     try {
       const [alertsRes, companyRes] = await Promise.all([
         api.get('/alerts/unread'),
         api.get('/company'),
       ]);
 
-      // count unread alerts
-      const count = alertsRes.data.alerts?.length ?? 0;
-      setUnreadAlerts(count);
-
+      setUnreadAlerts(alertsRes.data.alerts?.length ?? 0);
       setCompanySummary({
         current_risk: companyRes.data.current_risk,
         risk_color:   companyRes.data.risk_color,
         fetched_at:   companyRes.data.fetched_at,
       });
-
-      setLastUpdated(new Date());
+      // Use functional update to guarantee a new Date reference every time,
+      // even if called in quick succession
+      setLastUpdated(() => new Date());
     } catch {
-      // silent — don't crash if API is down
+      // silent
     }
   }, [isAuthenticated]);
 
-  // Initial fetch + poll every 60 seconds
   useEffect(() => {
     fetchAll();
     const interval = setInterval(fetchAll, POLL_INTERVAL);

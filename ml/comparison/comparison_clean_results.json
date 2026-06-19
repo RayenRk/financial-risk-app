@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-06-03T19:57:15.645319",
+  "cv_strategy": "GroupKFold(n_splits=5, groups=ticker)",
+  "samples_raw": 719,
+  "samples_balanced": 831,
+  "fixes_applied": [
+    "EPAM excluded from training set",
+    "GroupKFold by ticker \u2014 no company spans train and validation",
+    "Balancing applied inside each fold (training split only)",
+    "interest_coverage: clipped to [-20, 20]",
+    "debt_to_equity: clipped at 99th percentile",
+    "revenue_growth_yoy: filled with per-ticker then sector median"
+  ],
+  "models": {
+    "XGBoost": {
+      "f1_scores": [
+        0.9586206896551724,
+        0.9256618526179948,
+        0.9059551877848084,
+        0.9614678318135765,
+        0.985684161465971
+      ],
+      "acc_scores": [
+        0.9586206896551724,
+        0.9310344827586207,
+        0.9103448275862069,
+        0.9583333333333334,
+        0.9857142857142858
+      ],
+      "f1_mean": 0.9474779446675047,
+      "f1_std": 0.028212316181850862,
+      "acc_mean": 0.9488095238095238,
+      "acc_std": 0.025862746622341316,
+      "oof_auc": 0.9921471725129396,
+      "final_f1": 1.0,
+      "final_acc": 1.0,
+      "final_auc": 1.0
+    },
+    "Random Forest": {
+      "f1_scores": [
+        0.9525963013809254,
+        0.8980535045540208,
+        0.9075062832361913,
+        0.948588166728499,
+        0.9252126920698349
+      ],
+      "acc_scores": [
+        0.9517241379310345,
+        0.903448275862069,
+        0.9103448275862069,
+        0.9444444444444444,
+        0.9214285714285714
+      ],
+      "f1_mean": 0.9263913895938943,
+      "f1_std": 0.021635464475982292,
+      "acc_mean": 0.9262780514504654,
+      "acc_std": 0.01884730688558,
+      "oof_auc": 0.9910156538465196,
+      "final_f1": 0.9975966556552965,
+      "final_acc": 0.9975932611311673,
+      "final_auc": 1.0
+    }
+  },
+  "winner": "XGBoost"
+}

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { TrendingUp, Shield, AlertCircle } from "lucide-react";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function Login() {
   const { login } = useAuth();
@@ -31,7 +32,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex">
+    <div className="min-h-screen bg-gray-950 dark:bg-gray-950 flex">
       {/* Left panel — branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-gray-900 via-blue-950 to-gray-900 flex-col justify-between p-12">
         <div className="flex items-center gap-3">
@@ -53,25 +54,6 @@ export default function Login() {
             AI-powered risk detection and financial analysis and alerts for
             enterprise.
           </p>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-6">
-            {[
-              { label: "Model Accuracy", value: "91%" },
-              { label: "AUC Score", value: "0.97" },
-              { label: "Quarters Analyzed", value: "6" },
-            ].map((stat) => (
-              <div
-                key={stat.label}
-                className="bg-white/5 rounded-xl p-4 border border-white/10"
-              >
-                <div className="text-2xl font-bold text-white mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-gray-400 text-xs">{stat.label}</div>
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="flex items-center gap-2 text-gray-500 text-sm">
@@ -81,7 +63,10 @@ export default function Login() {
       </div>
 
       {/* Right panel — login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-gray-950">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-10 lg:hidden">
@@ -92,22 +77,26 @@ export default function Login() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-2">Welcome back</h2>
-            <p className="text-gray-400">Sign in to your account to continue</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Welcome back
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400">
+              Sign in to your account to continue
+            </p>
           </div>
 
           {/* Error */}
           {error && (
-            <div className="mb-6 flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="mb-6 flex items-start gap-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4">
+              <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 shrink-0 mt-0.5" />
+              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email address
               </label>
               <input
@@ -116,13 +105,13 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="admin@financialrisk.com"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <input
@@ -131,7 +120,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
               />
             </div>
 
@@ -152,7 +141,7 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="text-center text-gray-500 text-sm mt-4">
+          <p className="text-center text-gray-500 dark:text-gray-500 text-sm mt-4">
             Don't have an account?{" "}
             <Link
               to="/register"
@@ -162,22 +151,7 @@ export default function Login() {
             </Link>
           </p>
 
-          {/* Demo credentials hint */}
-          <div className="mt-8 p-4 bg-gray-900 rounded-xl border border-gray-800">
-            <p className="text-gray-500 text-xs font-medium mb-2 uppercase tracking-wider">
-              Demo credentials
-            </p>
-            <div className="space-y-1">
-              <p className="text-gray-400 text-sm">
-                <span className="text-gray-500">Admin: </span>
-                admin@financialrisk.com / Admin@1234
-              </p>
-              <p className="text-gray-400 text-sm">
-                <span className="text-gray-500">Analyst: </span>
-                analyst@financialrisk.com / Analyst@1234
-              </p>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

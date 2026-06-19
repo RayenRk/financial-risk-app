@@ -13,13 +13,12 @@ class AdviceController extends Controller
 {
     private string $fastApiUrl = 'http://localhost:8001';
 
-    // POST /api/advice/{ticker}
-    public function generate(Request $request, string $ticker)
+    // ── Shared: build payload from DB for a given ticker ──────────────────
+    private function buildPayload(string $ticker): array|\Illuminate\Http\JsonResponse
     {
         $ticker  = strtoupper(trim($ticker));
         $company = Company::where('ticker', $ticker)->firstOrFail();
 
-        // Get latest quarter with prediction
         $quarter = Quarter::where('company_id', $company->id)
             ->orderByDesc('quarter_date')
             ->with('riskPrediction')
@@ -33,36 +32,68 @@ class AdviceController extends Controller
 
         $prediction = $quarter->riskPrediction;
 
-        // Build payload for FastAPI
-        $payload = [
+        return [
             'ticker'             => $ticker,
             'company_name'       => $company->name,
             'risk_label'         => $prediction->risk_label,
             'confidence'         => (float) $prediction->confidence,
             'top_risk_drivers'   => $prediction->top_risk_drivers ?? [],
-            'current_ratio'      => $quarter->current_ratio      ? (float) $quarter->current_ratio      : null,
-            'debt_to_equity'     => $quarter->debt_to_equity     ? (float) $quarter->debt_to_equity     : null,
-            'operating_margin'   => $quarter->operating_margin   ? (float) $quarter->operating_margin   : null,
-            'net_margin'         => $quarter->net_margin         ? (float) $quarter->net_margin         : null,
-            'roe'                => $quarter->roe                ? (float) $quarter->roe                : null,
-            'roa'                => $quarter->roa                ? (float) $quarter->roa                : null,
-            'revenue_growth_yoy' => $quarter->revenue_growth_yoy ? (float) $quarter->revenue_growth_yoy : null,
-            'fcf_margin'         => $quarter->fcf_margin         ? (float) $quarter->fcf_margin         : null,
+            'current_ratio'      => $quarter->current_ratio       ? (float) $quarter->current_ratio      : null,
+            'debt_to_equity'     => $quarter->debt_to_equity      ? (float) $quarter->debt_to_equity     : null,
+            'operating_margin'   => $quarter->operating_margin    ? (float) $quarter->operating_margin   : null,
+            'net_margin'         => $quarter->net_margin          ? (float) $quarter->net_margin         : null,
+            'roe'                => $quarter->roe                 ? (float) $quarter->roe                : null,
+            'roa'                => $quarter->roa                 ? (float) $quarter->roa                : null,
+            'revenue_growth_yoy' => $quarter->revenue_growth_yoy  ? (float) $quarter->revenue_growth_yoy : null,
+            'fcf_margin'         => $quarter->fcf_margin          ? (float) $quarter->fcf_margin         : null,
+            'interest_coverage'  => $quarter->interest_coverage   ? (float) $quarter->interest_coverage  : null,
             'quarter_date'       => $quarter->quarter_date,
         ];
+    }
 
-        // Call FastAPI
+    // ── POST /api/advice/{ticker} — company-focused advice ────────────────
+    public function generate(Request $request, string $ticker)
+    {
+        $payload = $this->buildPayload($ticker);
+
+        // buildPayload returns a JsonResponse on error
+        if ($payload instanceof \Illuminate\Http\JsonResponse) {
+            return $payload;
+        }
+
         try {
             $response = Http::timeout(30)->post("{$this->fastApiUrl}/advice", $payload);
         } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'AI service unavailable. Please try again later.',
-            ], 503);
+            return response()->json(['message' => 'AI service unavailable.'], 503);
         }
 
         if ($response->failed()) {
             return response()->json([
                 'message' => $response->json('detail') ?? 'AI advice generation failed.',
+            ], $response->status());
+        }
+
+        return response()->json($response->json());
+    }
+
+    // ── POST /api/advice/{ticker}/analyst — analyst action plan ───────────
+    public function analyst(Request $request, string $ticker)
+    {
+        $payload = $this->buildPayload($ticker);
+
+        if ($payload instanceof \Illuminate\Http\JsonResponse) {
+            return $payload;
+        }
+
+        try {
+            $response = Http::timeout(30)->post("{$this->fastApiUrl}/advice/analyst", $payload);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'AI service unavailable.'], 503);
+        }
+
+        if ($response->failed()) {
+            return response()->json([
+                'message' => $response->json('detail') ?? 'AI analyst advice generation failed.',
             ], $response->status());
         }
 

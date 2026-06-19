@@ -109,7 +109,7 @@ export default function Profile() {
 
   if (loading) return (
     <Layout>
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-950">
         <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
       </div>
     </Layout>
@@ -117,30 +117,30 @@ export default function Profile() {
 
   return (
     <Layout>
-      <div className="p-8 space-y-6 max-w-2xl">
+      <div className="p-8 space-y-6 max-w-2xl bg-gray-50 dark:bg-gray-950 min-h-screen transition-colors duration-200">
 
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-white">Profile</h1>
-          <p className="text-gray-400 mt-1">Manage your account settings</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Profile</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your account settings</p>
         </div>
 
         {/* Account info card */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center shrink-0">
-              <span className="text-white text-2xl font-bold">
+            <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center shrink-0">
+              <span className="text-gray-800 dark:text-white text-2xl font-bold">
                 {profile?.name?.charAt(0).toUpperCase()}
               </span>
             </div>
             <div>
-              <p className="text-white font-semibold text-lg">{profile?.name}</p>
-              <p className="text-gray-400 text-sm">{profile?.email}</p>
+              <p className="text-gray-900 dark:text-white font-semibold text-lg">{profile?.name}</p>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">{profile?.email}</p>
               <div className="flex items-center gap-2 mt-2">
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${roleBadge(profile?.role ?? '')}`}>
                   {profile?.role}
                 </span>
-                <span className="text-gray-500 text-xs">
+                <span className="text-gray-400 dark:text-gray-500 text-xs">
                   Member since {new Date(profile?.created_at ?? '').toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
                 </span>
               </div>
@@ -149,49 +149,49 @@ export default function Profile() {
         </div>
 
         {/* Edit name + email */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-8 h-8 bg-blue-600/20 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-600/20 rounded-lg flex items-center justify-center">
               <User className="w-4 h-4 text-blue-400" />
             </div>
             <div>
-              <h3 className="text-white font-semibold">Personal Information</h3>
-              <p className="text-gray-500 text-xs">Update your name and email address</p>
+              <h3 className="text-gray-900 dark:text-white font-semibold">Personal Information</h3>
+              <p className="text-gray-400 dark:text-gray-500 text-xs">Update your name and email address</p>
             </div>
           </div>
 
           {nameSuccess && (
-            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl p-3 mb-4">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <p className="text-green-400 text-sm">{nameSuccess}</p>
+            <div className="flex items-center gap-2 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-3 mb-4">
+              <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-400" />
+              <p className="text-green-600 dark:text-green-400 text-sm">{nameSuccess}</p>
             </div>
           )}
           {nameError && (
-            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl p-3 mb-4">
-              <AlertCircle className="w-4 h-4 text-red-400" />
-              <p className="text-red-400 text-sm">{nameError}</p>
+            <div className="flex items-center gap-2 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-3 mb-4">
+              <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400" />
+              <p className="text-red-600 dark:text-red-400 text-sm">{nameError}</p>
             </div>
           )}
 
           <form onSubmit={handleNameUpdate} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 required
-                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
               />
             </div>
             <div className="flex justify-end">
@@ -207,34 +207,34 @@ export default function Profile() {
         </div>
 
         {/* Change password */}
-        <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-8 h-8 bg-purple-600/20 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-purple-100 dark:bg-purple-600/20 rounded-lg flex items-center justify-center">
               <Lock className="w-4 h-4 text-purple-400" />
             </div>
             <div>
-              <h3 className="text-white font-semibold">Change Password</h3>
-              <p className="text-gray-500 text-xs">Must be at least 8 characters with uppercase and numbers</p>
+              <h3 className="text-gray-900 dark:text-white font-semibold">Change Password</h3>
+              <p className="text-gray-400 dark:text-gray-500 text-xs">Must be at least 8 characters with uppercase and numbers</p>
             </div>
           </div>
 
           {passSuccess && (
-            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/30 rounded-xl p-3 mb-4">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <p className="text-green-400 text-sm">{passSuccess}</p>
+            <div className="flex items-center gap-2 bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/30 rounded-xl p-3 mb-4">
+              <CheckCircle className="w-4 h-4 text-green-500 dark:text-green-400" />
+              <p className="text-green-600 dark:text-green-400 text-sm">{passSuccess}</p>
             </div>
           )}
           {passError && (
-            <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/30 rounded-xl p-3 mb-4">
-              <AlertCircle className="w-4 h-4 text-red-400" />
-              <p className="text-red-400 text-sm">{passError}</p>
+            <div className="flex items-center gap-2 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-3 mb-4">
+              <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400" />
+              <p className="text-red-600 dark:text-red-400 text-sm">{passError}</p>
             </div>
           )}
 
           <form onSubmit={handlePasswordUpdate} className="space-y-4">
             {/* Current password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Current Password</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Password</label>
               <div className="relative">
                 <input
                   type={showCurrent ? 'text' : 'password'}
@@ -242,10 +242,10 @@ export default function Profile() {
                   onChange={e => setCurrentPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                 />
                 <button type="button" onClick={() => setShowCurrent(!showCurrent)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                   {showCurrent ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
@@ -253,7 +253,7 @@ export default function Profile() {
 
             {/* New password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">New Password</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password</label>
               <div className="relative">
                 <input
                   type={showNew ? 'text' : 'password'}
@@ -261,10 +261,10 @@ export default function Profile() {
                   onChange={e => setNewPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                 />
                 <button type="button" onClick={() => setShowNew(!showNew)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                   {showNew ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
@@ -272,7 +272,7 @@ export default function Profile() {
 
             {/* Confirm password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Confirm New Password</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm New Password</label>
               <div className="relative">
                 <input
                   type={showConfirm ? 'text' : 'password'}
@@ -280,10 +280,10 @@ export default function Profile() {
                   onChange={e => setConfirmPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                 />
                 <button type="button" onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                   {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>

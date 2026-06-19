@@ -4,6 +4,7 @@ backend/.env
 backend/storage/*.key
 backend/storage/logs/
 backend/bootstrap/cache/
+backend/*.ps1
 
 # React
 financial-risk-frontend/node_modules/

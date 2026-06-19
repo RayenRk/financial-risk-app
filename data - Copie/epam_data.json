@@ -1,0 +1,263 @@
+{
+  "company": {
+    "ticker": "EPAM",
+    "name": "EPAM Systems, Inc.",
+    "sector": "Technology",
+    "industry": "Information Technology Services",
+    "country": "United States",
+    "employees": 62850,
+    "market_cap": 6277009920,
+    "website": "https://www.epam.com",
+    "description": "EPAM Systems, Inc. provides digital platform engineering and software development services worldwide. The company offers engineering services, including requirements analysis and platform selection, customization, cross-platform migration, implementation, and integration; cloud services for creating",
+    "fetched_at": "2026-04-26T00:52:08.432367",
+    "model_f1": 0.9113,
+    "model_auc": 0.9716
+  },
+  "quarters": [
+    {
+      "date": "2024-09-30",
+      "ticker": "EPAM",
+      "revenue": null,
+      "gross_profit": null,
+      "operating_income": null,
+      "net_income": null,
+      "free_cash_flow": null,
+      "total_debt": null,
+      "cash": null,
+      "gross_margin": 0.2949,
+      "operating_margin": 0.1039,
+      "net_margin": 0.0766,
+      "current_ratio": 3.0219,
+      "debt_to_equity": 0.0434,
+      "roe": 0.0285,
+      "roa": 0.0217,
+      "interest_coverage": 100.0,
+      "revenue_growth_yoy": 0.1275,
+      "risk_label": "low_risk",
+      "risk_score": 0.9977999925613403,
+      "prob_high_risk": 0.00039999998989515007,
+      "prob_low_risk": 0.9977999925613403,
+      "prob_medium_risk": 0.0017999999690800905,
+      "top_risk_drivers": [
+        {
+          "feature": "current_ratio",
+          "importance": 1.2304
+        },
+        {
+          "feature": "interest_coverage",
+          "importance": 0.7311
+        },
+        {
+          "feature": "debt_to_equity",
+          "importance": 0.6343
+        }
+      ]
+    },
+    {
+      "date": "2024-12-31",
+      "ticker": "EPAM",
+      "revenue": 1248.35,
+      "gross_profit": 380.04,
+      "operating_income": 136.51,
+      "net_income": 103.3,
+      "free_cash_flow": 114.53,
+      "total_debt": 163.25,
+      "cash": 1286.27,
+      "gross_margin": 0.3044,
+      "operating_margin": 0.1094,
+      "net_margin": 0.0827,
+      "current_ratio": 2.9551,
+      "debt_to_equity": 0.045,
+      "roe": 0.0285,
+      "roa": 0.0217,
+      "interest_coverage": 100.0,
+      "revenue_growth_yoy": 0.1275,
+      "risk_label": "low_risk",
+      "risk_score": 0.998199999332428,
+      "prob_high_risk": 0.0003000000142492354,
+      "prob_low_risk": 0.998199999332428,
+      "prob_medium_risk": 0.001500000013038516,
+      "top_risk_drivers": [
+        {
+          "feature": "current_ratio",
+          "importance": 1.2332
+        },
+        {
+          "feature": "interest_coverage",
+          "importance": 0.7246
+        },
+        {
+          "feature": "debt_to_equity",
+          "importance": 0.6352
+        }
+      ]
+    },
+    {
+      "date": "2025-03-31",
+      "ticker": "EPAM",
+      "revenue": 1301.69,
+      "gross_profit": 349.68,
+      "operating_income": 99.33,
+      "net_income": 73.48,
+      "free_cash_flow": 14.83,
+      "total_debt": 158.14,
+      "cash": 1173.64,
+      "gross_margin": 0.2686,
+      "operating_margin": 0.0763,
+      "net_margin": 0.0565,
+      "current_ratio": 3.0612,
+      "debt_to_equity": 0.0434,
+      "roe": 0.0202,
+      "roa": 0.0156,
+      "interest_coverage": 100.0,
+      "revenue_growth_yoy": 0.1275,
+      "risk_label": "low_risk",
+      "risk_score": 0.998199999332428,
+      "prob_high_risk": 0.00039999998989515007,
+      "prob_low_risk": 0.998199999332428,
+      "prob_medium_risk": 0.00139999995008111,
+      "top_risk_drivers": [
+        {
+          "feature": "current_ratio",
+          "importance": 1.2344
+        },
+        {
+          "feature": "interest_coverage",
+          "importance": 0.6417
+        },
+        {
+          "feature": "debt_to_equity",
+          "importance": 0.6117
+        }
+      ]
+    },
+    {
+      "date": "2025-06-30",
+      "ticker": "EPAM",
+      "revenue": 1353.44,
+      "gross_profit": 389.43,
+      "operating_income": 126.48,
+      "net_income": 88.03,
+      "free_cash_flow": 43.37,
+      "total_debt": 162.69,
+      "cash": 1041.34,
+      "gross_margin": 0.2877,
+      "operating_margin": 0.0934,
+      "net_margin": 0.065,
+      "current_ratio": 3.1715,
+      "debt_to_equity": 0.0444,
+      "roe": 0.024,
+      "roa": 0.0187,
+      "interest_coverage": 100.0,
+      "revenue_growth_yoy": 0.1275,
+      "risk_label": "low_risk",
+      "risk_score": 0.9976000189781189,
+      "prob_high_risk": 0.00039999998989515007,
+      "prob_low_risk": 0.9976000189781189,
+      "prob_medium_risk": 0.002099999925121665,
+      "top_risk_drivers": [
+        {
+          "feature": "current_ratio",
+          "importance": 1.2303
+        },
+        {
+          "feature": "interest_coverage",
+          "importance": 0.6829
+        },
+        {
+          "feature": "debt_to_equity",
+          "importance": 0.6289
+        }
+      ]
+    },
+    {
+      "date": "2025-09-30",
+      "ticker": "EPAM",
+      "revenue": 1394.37,
+      "gross_profit": 411.2,
+      "operating_income": 144.94,
+      "net_income": 106.82,
+      "free_cash_flow": 286.38,
+      "total_debt": 155.22,
+      "cash": 1239.14,
+      "gross_margin": 0.2949,
+      "operating_margin": 0.1039,
+      "net_margin": 0.0766,
+      "current_ratio": 3.0219,
+      "debt_to_equity": 0.0417,
+      "roe": 0.0287,
+      "roa": 0.0221,
+      "interest_coverage": 100.0,
+      "revenue_growth_yoy": 0.1275,
+      "risk_label": "low_risk",
+      "risk_score": 0.9965999722480774,
+      "prob_high_risk": 0.00039999998989515007,
+      "prob_low_risk": 0.9965999722480774,
+      "prob_medium_risk": 0.003100000089034438,
+      "top_risk_drivers": [
+        {
+          "feature": "current_ratio",
+          "importance": 1.248
+        },
+        {
+          "feature": "interest_coverage",
+          "importance": 0.7429
+        },
+        {
+          "feature": "debt_to_equity",
+          "importance": 0.6469
+        }
+      ]
+    },
+    {
+      "date": "2025-12-31",
+      "ticker": "EPAM",
+      "revenue": 1407.55,
+      "gross_profit": 423.2,
+      "operating_income": 149.25,
+      "net_income": 109.35,
+      "free_cash_flow": 268.11,
+      "total_debt": 143.7,
+      "cash": 1296.08,
+      "gross_margin": 0.3007,
+      "operating_margin": 0.106,
+      "net_margin": 0.0777,
+      "current_ratio": 2.5937,
+      "debt_to_equity": 0.0391,
+      "roe": 0.0297,
+      "roa": 0.0223,
+      "interest_coverage": 100.0,
+      "revenue_growth_yoy": 0.1275,
+      "risk_label": "low_risk",
+      "risk_score": 0.9969000220298767,
+      "prob_high_risk": 0.00039999998989515007,
+      "prob_low_risk": 0.9969000220298767,
+      "prob_medium_risk": 0.0027000000700354576,
+      "top_risk_drivers": [
+        {
+          "feature": "current_ratio",
+          "importance": 1.2468
+        },
+        {
+          "feature": "interest_coverage",
+          "importance": 0.7353
+        },
+        {
+          "feature": "debt_to_equity",
+          "importance": 0.6376
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_quarters": 6,
+    "date_range": "2024-09-30 \u2192 2025-12-31",
+    "latest_risk": "low_risk",
+    "latest_confidence": 0.9969000220298767,
+    "risk_distribution": {
+      "low_risk": 6,
+      "medium_risk": 0,
+      "high_risk": 0
+    }
+  }
+}

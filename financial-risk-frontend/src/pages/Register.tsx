@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.tsx";
 import { TrendingUp, Shield, AlertCircle, Eye, EyeOff } from "lucide-react";
 import api from "../api/axios.ts";
+import ThemeToggle from "../components/ThemeToggle.tsx";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -85,43 +86,16 @@ export default function Register() {
 
         <div>
           <h1 className="text-4xl font-bold text-white leading-tight mb-4">
-            Join the
+            Join the Risk Detection
             <br />
-            <span className="text-blue-400">Risk Intelligence</span>
-            <br />
-            Platform
+            <span className="text-blue-400">Intelligence Platform</span>
           </h1>
           <p className="text-gray-400 text-lg leading-relaxed mb-10">
             Monitor financial health, detect risk early, and make data-driven
             decisions with AI-powered insights.
           </p>
 
-          <div className="space-y-4">
-            {[
-              {
-                title: "Real-time Risk Detection",
-                desc: "ML model scores companies every quarter",
-              },
-              {
-                title: "Smart Alert System",
-                desc: "Email + popup notifications on risk changes",
-              },
-              {
-                title: "Multi-company Analysis",
-                desc: "Analyze any publicly listed company instantly",
-              },
-            ].map((item) => (
-              <div key={item.title} className="flex items-start gap-3">
-                <div className="w-5 h-5 bg-blue-500/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full" />
-                </div>
-                <div>
-                  <p className="text-white text-sm font-medium">{item.title}</p>
-                  <p className="text-gray-500 text-xs">{item.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
+          
         </div>
 
         <div className="flex items-center gap-2 text-gray-500 text-sm">
@@ -131,7 +105,8 @@ export default function Register() {
       </div>
 
       {/* Right panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white dark:bg-gray-950 relative">
+        <div className="absolute top-4 right-4"><ThemeToggle /></div>
         <div className="w-full max-w-md">
           {/* Mobile logo */}
           <div className="flex items-center gap-3 mb-10 lg:hidden">
@@ -142,10 +117,10 @@ export default function Register() {
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
               Create account
             </h2>
-            <p className="text-gray-400">
+            <p className="text-gray-500 dark:text-gray-400">
               Already have an account?{" "}
               <Link
                 to="/login"
@@ -158,16 +133,16 @@ export default function Register() {
 
           {/* Error */}
           {error && (
-            <div className="mb-6 flex items-start gap-3 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-              <p className="text-red-400 text-sm">{error}</p>
+            <div className="mb-6 flex items-start gap-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-xl p-4">
+              <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 shrink-0 mt-0.5" />
+              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Full Name
               </label>
               <input
@@ -176,13 +151,13 @@ export default function Register() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="John Doe"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
               />
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email address
               </label>
               <input
@@ -191,13 +166,13 @@ export default function Register() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="john@example.com"
-                className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
@@ -207,12 +182,12 @@ export default function Register() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="Min 8 chars, uppercase + number"
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -225,22 +200,22 @@ export default function Register() {
               {strength && (
                 <div className="mt-2">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-gray-500">Password strength</span>
+                    <span className="text-gray-500 dark:text-gray-500">Password strength</span>
                     <span
                       className={`font-medium ${
                         strength.label === "Strong"
-                          ? "text-green-400"
+                          ? "text-green-500 dark:text-green-400"
                           : strength.label === "Good"
-                            ? "text-blue-400"
+                            ? "text-blue-500 dark:text-blue-400"
                             : strength.label === "Fair"
-                              ? "text-yellow-400"
-                              : "text-red-400"
+                              ? "text-yellow-500 dark:text-yellow-400"
+                              : "text-red-500 dark:text-red-400"
                       }`}
                     >
                       {strength.label}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-800 rounded-full h-1.5">
+                  <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-full h-1.5">
                     <div
                       className={`h-1.5 rounded-full transition-all ${strength.color} ${strength.width}`}
                     />
@@ -251,7 +226,7 @@ export default function Register() {
 
             {/* Confirm password */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Confirm Password
               </label>
               <div className="relative">
@@ -261,12 +236,12 @@ export default function Register() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   placeholder="••••••••"
-                  className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-3 pr-10 text-white placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
+                  className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 pr-10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   {showConfirm ? (
                     <EyeOff className="w-4 h-4" />
@@ -277,7 +252,7 @@ export default function Register() {
               </div>
               {confirmPassword && (
                 <p
-                  className={`text-xs mt-1.5 ${password === confirmPassword ? "text-green-400" : "text-red-400"}`}
+                  className={`text-xs mt-1.5 ${password === confirmPassword ? "text-green-500 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}
                 >
                   {password === confirmPassword
                     ? "✓ Passwords match"
@@ -303,7 +278,7 @@ export default function Register() {
             </button>
           </form>
 
-          <p className="text-gray-600 text-xs text-center mt-6">
+          <p className="text-gray-400 dark:text-gray-600 text-xs text-center mt-6">
             New accounts are created with Analyst role by default. Contact an
             admin to upgrade to Admin role.
           </p>
